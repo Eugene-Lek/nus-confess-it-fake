@@ -4,8 +4,10 @@ import CreateIcon from '@mui/icons-material/Create';
 import DraftsIcon from '@mui/icons-material/Drafts';
 import ArticleIcon from '@mui/icons-material/Article';
 import ThumbUpOffAltIcon from '@mui/icons-material/ThumbUpOffAlt';
-import { FC } from "react";
+import { FC, MouseEvent } from "react";
 import { useRouter } from "next/router";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { clickedLogin } from "../popups/popup_slice";
 
 const nav = [
     {label: "Home", path: "/", icon: <HomeIcon/>},
@@ -17,6 +19,19 @@ const nav = [
 
 export const SideBar: FC = () => {
     const router = useRouter() 
+
+    // If the user clicked any page except the home page and has not logged in, 
+    // redirect them to the login popup
+    const authenticated = useAppSelector((state) => state.session.authenticated)
+    const dispatch = useAppDispatch()
+    const onClick = (path: string) => {
+      if (path != "/" && !authenticated) {
+          dispatch(clickedLogin())
+          return
+      }
+
+      router.push(path)
+    }
 
     return (
         <Drawer
@@ -32,7 +47,7 @@ export const SideBar: FC = () => {
             <List>
             {nav.map((page, index) => (
                 <ListItem key={page.label} disablePadding>
-                <ListItemButton onClick={() => {router.push(page.path)}}>
+                <ListItemButton onClick={() => onClick(page.path)}>
                     <ListItemIcon>{page.icon}</ListItemIcon>
                     <ListItemText primary={page.label} />
                 </ListItemButton>
