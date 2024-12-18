@@ -7,6 +7,6 @@ export const SignUpButton: FC = () => {
     const dispatch = useAppDispatch()
 
     return (
-        <Button variant="contained" onClick={() => dispatch(clickedSignup())} color="midBlue">Sign Up</Button>
+        <Button variant="contained" onClick={() => dispatch(clickedSignup())} color="khaki">Sign Up</Button>
     )
 }

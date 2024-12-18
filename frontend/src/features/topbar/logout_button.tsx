@@ -16,6 +16,6 @@ export const LogoutButton: FC = () => {
     }
 
     return (
-        <LoadingButton variant="contained" onClick={handleLogout} loading={loading} color="midBlue">Logout</LoadingButton>
+        <LoadingButton variant="contained" onClick={handleLogout} loading={loading} color="khaki">Logout</LoadingButton>
     )
 }

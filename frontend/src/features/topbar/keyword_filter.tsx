@@ -3,6 +3,10 @@ import SearchIcon from "@mui/icons-material/Search";
 import { FC } from "react";
 
 export const KeywordFilter: FC = () => {
+    // TODO:
+    // On change, update filter state
+    // On click search, make API call
+
     return (
         <Box>
             <TextField 
@@ -13,7 +17,7 @@ export const KeywordFilter: FC = () => {
                 rows={1}
                 sx={{width: {sm: "150px", md: "200px", lg: "300px"}}}/>
             <IconButton type="submit" aria-label="search">
-                <SearchIcon style={{ fill: "blue" }} />
+                <SearchIcon style={{ fill: "#8D99AE" }} />
             </IconButton>
         </Box>
 

@@ -3,20 +3,20 @@ import { createTheme } from "@mui/material";
 const defaultTheme = createTheme()
 export const Theme = createTheme({
     palette: {
-        blue: defaultTheme.palette.augmentColor({
+        space: defaultTheme.palette.augmentColor({
             color: {
-                main: "#064ACB"
+                main: "#51361a"
             },
-            name: "blue"
+            name: "space"
         }), 
         orange: defaultTheme.palette.augmentColor({
             color: {
                 main: "#F3A953"
             }
         }),
-        midBlue: defaultTheme.palette.augmentColor({
+        khaki: defaultTheme.palette.augmentColor({
             color: {
-                main: "#366ED8"
+                main: "#946846"
             }
         }),
         offWhite: defaultTheme.palette.augmentColor({
@@ -31,15 +31,15 @@ export const Theme = createTheme({
 // Augment the palette to include this palette
 declare module '@mui/material/styles' {
     interface Palette {
-        blue?: Palette["primary"];
+        space?: Palette["primary"];
         orange: Palette["primary"];
-        midBlue: Palette["primary"];
+        khaki: Palette["primary"];
         offWhite: Palette["primary"];
     }
     interface PaletteOptions {
-        blue?: PaletteOptions["primary"];
+        space?: PaletteOptions["primary"];
         orange: PaletteOptions["primary"];
-        midBlue: PaletteOptions["primary"];
+        khaki: PaletteOptions["primary"];
         offWhite: PaletteOptions["primary"];
     }
 }
@@ -47,18 +47,18 @@ declare module '@mui/material/styles' {
 // Update the Button's color options to include these options
 declare module '@mui/material/Button' {
     interface ButtonPropsColorOverrides {
-        blue: true, 
+        space: true, 
         orange: true,
-        midBlue: true,
+        khaki: true,
         offWhite: true,
     }
   }
 
   declare module '@mui/material/Typography' {
     interface TypographyPropsColorOverrides {
-        blue: true, 
+        space: true, 
         orange: true,
-        midBlue: true,
+        khaki: true,
         offWhite: true,
     }
   }

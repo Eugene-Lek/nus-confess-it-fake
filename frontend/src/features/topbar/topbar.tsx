@@ -19,7 +19,7 @@ export const Topbar: FC<PropsWithChildren> = () => {
         <>
             <AppBar position='fixed' sx={{borderColor: "#AEAEAE", backgroundColor: "white", zIndex: (theme) => theme.zIndex.drawer + 1}}>
                 <Toolbar sx={{display: 'flex', justifyContent: 'space-between'}}>
-                    <Typography variant='h5' sx={{color: "black"}}>NUSConfessIT</Typography>
+                    <Typography variant='h5' color="space">NUSConfessIT</Typography>
                     <Box sx={{ display: 'flex', gap: "20px", alignItems: "center"}}>
                         <KeywordFilter/>
                         <TagFilter/>
