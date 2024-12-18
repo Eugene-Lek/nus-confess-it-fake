@@ -1,7 +1,7 @@
 package postgres
 
 import (
-	"github.com/lib/pq" // Import pq for its side effects (driver install)
+	_ "github.com/lib/pq" // Import pq for its side effects (driver install)
 )
 
 type User struct {

@@ -1,5 +1,9 @@
 package httperror
 
+import (
+	"net/http"
+)
+
 // Define a custom error in order to track the http status of the error too
 // Code refers to a custom error code
 type Error struct {
