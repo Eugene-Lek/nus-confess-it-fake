@@ -3,7 +3,6 @@ package postgres
 import (
 	"backend/httperror"
 	"database/sql"
-	"fmt"
 
 	"github.com/lib/pq"
 )
@@ -35,7 +34,6 @@ type Postgres2 interface {
 
 	// Post models
 	CreatePost(Post)
-	CreateDraft(Post)
 
 	// Note: Posts can be sorted by time or likes.
 	GetPostById(id string) Post

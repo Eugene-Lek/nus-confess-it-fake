@@ -1,4 +1,4 @@
-import { Comment, CommentCard } from "./comment_card";
+import { Comment } from "./comment_card";
 import { Box, CircularProgress, Divider, TextField, Typography } from "@mui/material";
 import { VoteBox } from "./vote_box";
 import { MouseEvent, useRef, useState } from "react";
@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { formatDate, Textarea } from "./utils";
 import { clickedLogin } from "../popups/popup_slice";
 import { AddComment } from "./add_comment";
+import { CommentCardsUnderPost } from "./comment_cards";
 
 export interface Post {
     id: string,
@@ -66,9 +67,7 @@ export const Post = (post: Post) => {
                 <Typography variant="body2">{post.body}</Typography>            
                 <VoteBox {...post}/>
                 <Divider/>
-                {comments.map(comment => (
-                    <CommentCard comment={comment} setReplyTo={setReplyTo}/>
-                ))}
+                <CommentCardsUnderPost comments={comments} setReplyTo={setReplyTo}/>
                 <Box ref={lastCommentRef}/>
             </Box>
             <AddComment 
