@@ -16,6 +16,7 @@ ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT SELECT, INSERT
 
 -- Import necessary extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "intarray";
 
 -- Enums
 CREATE TYPE STATUS AS ENUM (
@@ -44,8 +45,16 @@ CREATE TABLE IF NOT EXISTS post (
     author VARCHAR(20) NOT NULL,
     status STATUS NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+
+    -- Calculate the vector embeddings of the title and body combined to enable search by query
+    textsearchable_index tsvector GENERATED ALWAYS AS (to_tsvector('english', title || " " || body)) STORED,
+
+    FOREIGN KEY (author) REFERENCES user_account(id)
 );
+
+-- Create a GIN index of the vector embeddings to speed up search
+CREATE INDEX textsearch_idx ON post USING GIN (textsearchable_index);
 
 CREATE TABLE IF NOT EXISTS post_tag (
     post_id UUID,
@@ -59,6 +68,7 @@ CREATE TABLE IF NOT EXISTS post_vote (
     viewer VARCHAR(20),
     post_id UUID,
     vote VOTE NOT NULL,
+
     PRIMARY KEY (viewer, post_id),
     FOREIGN KEY (viewer) REFERENCES user_account(username),
     FOREIGN KEY (post_id) REFERENCES post(id)
@@ -74,14 +84,24 @@ CREATE TABLE IF NOT EXISTS comment (
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
 
+    -- Calculate the vector embeddings of the title and body combined to enable search by query
+    textsearchable_index tsvector GENERATED ALWAYS AS (to_tsvector('english', title || " " || body)) STORED,
+
+    FOREIGN KEY (author) REFERENCES user_account(id),
     FOREIGN KEY (post_id) REFERENCES post(id),
     FOREIGN KEY (parent_id) REFERENCES comment(id)
 );
+
+-- Create a GIN index of the vector embeddings to speed up search
+CREATE INDEX textsearch_idx ON post USING GIN (textsearchable_index);
+
+
 
 CREATE TABLE IF NOT EXISTS comment_vote (
     viewer VARCHAR(20),
     comment_id UUID,
     vote VOTE NOT NULL,
+    
     PRIMARY KEY (viewer, comment_id),
     FOREIGN KEY (viewer) REFERENCES user_account(username),
     FOREIGN KEY (comment_id) REFERENCES comment(id)
