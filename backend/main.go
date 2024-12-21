@@ -18,7 +18,7 @@ func main() {
 	logOutputMedium := os.Stdout
 	rootLogger := routes.NewRootLogger(logOutputMedium)
 
-	listenAddress := "localhost:3000"
+	listenAddress := "localhost:5000"
 	dbConnString := "host=localhost port=5433 user=backend password=abcd1234 dbname=backend sslmode=disable"
 
 	postgres, err := postgres.NewPostgresStore(dbConnString)

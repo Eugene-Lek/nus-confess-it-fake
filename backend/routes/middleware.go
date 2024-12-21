@@ -207,8 +207,7 @@ func getAuthenticatedUser(r *http.Request) postgres.User {
 func verifyAuthorization(authEnforcer casbin.IEnforcer) mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			user := r.Context().Value(authenticatedUserKey).(postgres.User)
-
+			user := getAuthenticatedUser(r)
 			authorized, err := authEnforcer.Enforce(user.Username, r.URL.Path, r.Method)
 			if err != nil {
 				sendToErrorHandlingMiddleware(httperror.NewInternalServerError(err), r)
