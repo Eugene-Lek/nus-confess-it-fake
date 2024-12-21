@@ -1,6 +1,8 @@
 package postgres
 
 import (
+	"database/sql"
+
 	_ "github.com/lib/pq" // Import pq for its side effects (driver install)
 )
 
@@ -21,13 +23,18 @@ func (postgres *PostgresStore) CreateUser(user User) error {
 func (postgres *PostgresStore) GetUser(username string) (*User, error) {
 	var user User
 
-	query := `SELECT (username, password) FROM user_account WHERE username = $1`
-	err := postgres.db.QueryRow(query, username).Scan(&user.Username, &user.Password)
+	query := `SELECT password FROM user_account WHERE username = $1`
+	err := postgres.db.QueryRow(query, username).Scan(&user.Password)
 	
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+
 	err = checkPostgresErr(err)
-	if (err != nil) {
+	if err != nil {
 		return nil, err
 	} else {
+		user.Username = username
 		return &user, nil
 	}
 }
