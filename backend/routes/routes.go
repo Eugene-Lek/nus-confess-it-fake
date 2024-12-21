@@ -8,6 +8,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
+	"github.com/gorilla/handlers"
 
 	"backend/postgres"
 )
@@ -23,7 +24,7 @@ type Router struct {
 	authEnforcer        casbin.IEnforcer
 }
 
-func NewRouter(postgres *postgres.PostgresStore, universalTranslator *ut.UniversalTranslator, validate *validator.Validate, rootLogger *Logger, sessionStore sessions.Store, authEnforcer casbin.IEnforcer) *Router {
+func NewRouter(postgres *postgres.PostgresStore, universalTranslator *ut.UniversalTranslator, validate *validator.Validate, rootLogger *Logger, sessionStore sessions.Store, authEnforcer casbin.IEnforcer) http.Handler {
 	r := mux.NewRouter()
 
 	router := &Router{
@@ -74,7 +75,13 @@ func NewRouter(postgres *postgres.PostgresStore, universalTranslator *ut.Univers
 
 	router.NotFoundHandler = setRequestLogger(router.rootLogger)(errorHandling(http.HandlerFunc(router.handleNotFound))) // Custom 404 handler
 
-	return router
+	// Accept requests that come from the frontend domain
+	headers := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
+	methods := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"})
+	origins := handlers.AllowedOrigins([]string{"http://localhost:3000"})
+	creds := handlers.AllowCredentials()
+
+	return handlers.CORS(headers, methods, origins, creds)(router)
 }
 
 func (router *Router) handleNotFound(w http.ResponseWriter, r *http.Request) {
