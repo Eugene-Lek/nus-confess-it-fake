@@ -13,6 +13,7 @@ require (
 	github.com/go-playground/universal-translator v0.18.1
 	github.com/go-playground/validator/v10 v10.23.0
 	github.com/google/uuid v1.6.0
+	github.com/gorilla/handlers v1.5.2
 	github.com/gorilla/mux v1.8.1
 	github.com/gorilla/sessions v1.4.0
 	github.com/lib/pq v1.10.9
@@ -23,6 +24,7 @@ require (
 require (
 	github.com/bmatcuk/doublestar/v4 v4.6.1 // indirect
 	github.com/casbin/govaluate v1.2.0 // indirect
+	github.com/felixge/httpsnoop v1.0.3 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/go-pg/zerochecker v0.2.0 // indirect
 	github.com/gorilla/securecookie v1.1.2 // indirect
