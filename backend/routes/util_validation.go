@@ -86,7 +86,7 @@ func NewInputValidationError(validationErrors map[string]string) *httperror.Erro
 	return &httperror.Error{
 		Status:  http.StatusBadRequest,
 		Message: message,
-		Code:    "INPUT-VALIDATION-ERROR",
+		Code:    "INVALID-INPUT-ERROR",
 	}
 }
 
