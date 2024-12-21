@@ -1,25 +1,14 @@
 import type { AppProps } from "next/app";
-import { Provider } from 'react-redux';
-import { Store } from '../redux/store';
-import { Topbar } from "@/features/topbar/topbar";
-import { SideBar } from "@/features/sidebar/sidebar";
-import { ThemeProvider } from "@mui/material";
-import { PopUp } from "@/features/popups/popup";
-import { Theme } from "@/styles/mui_theme";
-import { BodyContainer } from "@/features/global/BodyContainer";
+import dynamic from 'next/dynamic'
+
+// Root layout is defined separately instead of inside the _app file so that 
+// it can be imported in the _app file as a non-ssr component
+// This is necessary to avoid hydration errors that only occur during development
+// because the dev server always prerenders components but some components rely on
+// localStorage, which only exists in the client.
+
+const NoSSRRootAppLayout = dynamic(() => import("@/features/global/RootAppLayout"), { ssr: false })
 
 export default function App({ Component: Body, pageProps }: AppProps) {
-  return (
-    <ThemeProvider theme={Theme}>
-      <Provider store={Store}>
-        <PopUp/>
-        <Topbar/>
-        <SideBar/>
-        <BodyContainer> 
-          <Body {...pageProps} />
-        </BodyContainer>
-      </Provider>
-    </ThemeProvider>
-  )
-
+  return <NoSSRRootAppLayout Component={Body} pageProps={pageProps}/>
 }
