@@ -1,5 +1,5 @@
 import popupReducer from '@/features/popups/popup_slice'
-import sessionReducer from '@/features/global/session_slice'
+import sessionReducer from '@/features/auth/session_slice'
 import { configureStore } from '@reduxjs/toolkit'
 
 export const Store =configureStore({
