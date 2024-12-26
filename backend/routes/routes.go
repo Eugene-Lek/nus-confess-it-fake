@@ -7,7 +7,6 @@ import (
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
-	"github.com/gorilla/sessions"
 	"github.com/gorilla/handlers"
 
 	"backend/postgres"
@@ -20,11 +19,10 @@ type Router struct {
 	universalTranslator *ut.UniversalTranslator
 	validate            *validator.Validate
 	rootLogger          *Logger
-	sessionStore        sessions.Store
 	authEnforcer        casbin.IEnforcer
 }
 
-func NewRouter(postgres *postgres.PostgresStore, universalTranslator *ut.UniversalTranslator, validate *validator.Validate, rootLogger *Logger, sessionStore sessions.Store, authEnforcer casbin.IEnforcer) http.Handler {
+func NewRouter(postgres *postgres.PostgresStore, universalTranslator *ut.UniversalTranslator, validate *validator.Validate, rootLogger *Logger, authEnforcer casbin.IEnforcer) http.Handler {
 	r := mux.NewRouter()
 
 	router := &Router{
@@ -33,7 +31,6 @@ func NewRouter(postgres *postgres.PostgresStore, universalTranslator *ut.Univers
 		universalTranslator: universalTranslator,
 		validate:            validate,
 		rootLogger:          rootLogger,
-		sessionStore:        sessionStore,
 		authEnforcer:        authEnforcer,
 	}
 
@@ -42,7 +39,7 @@ func NewRouter(postgres *postgres.PostgresStore, universalTranslator *ut.Univers
 	router.Use(logRequestCompletion)
 	router.Use(errorHandling)
 	router.Use(setTranslator(router.universalTranslator))
-	router.Use(authenticateUser(router.sessionStore))
+	router.Use(authenticateUser)
 	router.Use(verifyAuthorization(router.authEnforcer))
 
 	apiRouter := r.PathPrefix("/api/v1").Subrouter()
@@ -63,15 +60,18 @@ func NewRouter(postgres *postgres.PostgresStore, universalTranslator *ut.Univers
 	postRouter.HandleFunc("/{postId}", router.handleGetPost).Methods("GET")
 	postRouter.HandleFunc("/{postId}", router.handleCreatePost).Methods("POST")
 	postRouter.HandleFunc("/{postId}", router.handleUpdatePost).Methods("PUT")
+	postRouter.HandleFunc("/{postId}/conversion", router.handleUpdateDraftToPost).Methods("POST")
 	postRouter.HandleFunc("/{postId}", router.handleDeletePost).Methods("DELETE")
 	postRouter.HandleFunc("/{postId}/comments", router.handleGetCommentsByPostId).Methods("GET")
 	postRouter.HandleFunc("/{postId}/vote", router.handleUpsertPostVote).Methods("PUT") // Endpoint for voting on a post
+	postRouter.HandleFunc("/{postId}/vote", router.handleUpsertPostVote).Methods("DELETE") // Endpoint for voting on a post
  
 	commentRouter := apiRouter.PathPrefix("/comments").Subrouter()
 	commentRouter.HandleFunc("/{commentId}", router.handleCreateComment).Methods("POST")
 	commentRouter.HandleFunc("/{commentId}", router.handleUpdateComment).Methods("PUT")
 	commentRouter.HandleFunc("/{commentId}", router.handleDeleteComment).Methods("DELETE")
-	commentRouter.HandleFunc("/{commentId}/vote", router.handleUpsertCommentVote).Methods("POST") // Endpoint for voting on a comment
+	commentRouter.HandleFunc("/{commentId}/vote", router.handleUpsertCommentVote).Methods("PUT") // Endpoint for voting on a comment
+	commentRouter.HandleFunc("/{commentId}/vote", router.handleUpsertCommentVote).Methods("DELETE") // Endpoint for voting on a comment
 
 	router.NotFoundHandler = setRequestLogger(router.rootLogger)(errorHandling(http.HandlerFunc(router.handleNotFound))) // Custom 404 handler
 
