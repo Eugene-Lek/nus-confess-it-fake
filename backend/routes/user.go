@@ -52,12 +52,14 @@ func (router *Router) handleCreateUser(w http.ResponseWriter, r *http.Request) {
 	var authenticatedPolicies = [][]string{
 		{user.Username, "/api/{version}/posts/{postId}", "POST"}, // Auth to create posts
 		{user.Username, "/api/{version}/posts/{postId}/vote", "PUT"}, // Auth to liked/dislike posts
+		{user.Username, "/api/{version}/posts/{postId}/vote", "DELETE"}, // Auth to liked/dislike posts
 		{user.Username, fmt.Sprintf("/api/{version}/users/%s/posts", user.Username), "GET"}, // Auth to see own posts
 		{user.Username, fmt.Sprintf("/api/{version}/users/%s/drafts", user.Username), "GET"}, // Auth to see own drafts
 		{user.Username, fmt.Sprintf("/api/{version}/users/%s/liked-posts", user.Username), "GET"}, // Auth to see liked posts
 
 		{user.Username, "/api/{version}/comments/{commentId}", "POST"}, // Auth to create comments
 		{user.Username, "/api/{version}/comments/{commentId}/vote", "PUT"}, // Auth to liked/dislike comments
+		{user.Username, "/api/{version}/comments/{commentId}/vote", "DELETE"}, // Auth to liked/dislike comments
 		{user.Username, fmt.Sprintf("/api/{version}/users/%s/comments", user.Username), "GET"}, // Auth to see own comments
 		{user.Username, fmt.Sprintf("/api/{version}/users/%s/liked-comments", user.Username), "GET"}, // Auth to see liked comments
 	}
@@ -71,5 +73,11 @@ func (router *Router) handleCreateUser(w http.ResponseWriter, r *http.Request) {
 	requestLogger := getRequestLogger(r)
 	requestLogger.Info("USER-CREATED", "username", user.Username)
 
+	authCookie, err := createAuthCookie(user.Username)
+
+	requestLogger.Info("JWT-CREATED", "jwt", authCookie.Value, "username", user.Username)
+	requestLogger.Info("USER-AUTHENTICATED", "username", user.Username)
+
+	http.SetCookie(w, authCookie) // Cookie must be set before header is written otherwise cookie will not be set
 	w.WriteHeader(http.StatusCreated)
 }
