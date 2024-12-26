@@ -1,21 +1,31 @@
 import { useAppDispatch } from "@/redux/hooks";
 import { FC, useState } from "react";
-import { loggedOut } from "../global/session_slice";
+import { loggedOut } from "../auth/auth";
 import { LoadingButton } from "@mui/lab";
+import { errorOccured } from "../popups/popup_slice";
+import { useLogoutMutation } from "../popups/api_slice";
+import { useRouter } from "next/router";
 
 export const LogoutButton: FC = () => {
     const dispatch = useAppDispatch()
-    const [loading, setLoading] = useState(false)
+    const router = useRouter()
 
+    const [logout,  { isLoading }] = useLogoutMutation()
     const handleLogout = async() => {
-        setLoading(true)
-        // Make API call to delete session
-        await new Promise(r => setTimeout(r, 2000));
-        setLoading(false)
-        dispatch(loggedOut())
+
+        try {
+            await logout().unwrap()
+
+            loggedOut()
+            router.push("/")
+
+        } catch (err: any) {
+            // err returns has a property "data" that corresponds to the response body
+            dispatch(errorOccured(err.data.message))
+        }
     }
 
     return (
-        <LoadingButton variant="contained" onClick={handleLogout} loading={loading} color="khaki">Logout</LoadingButton>
+        <LoadingButton variant="contained" onClick={handleLogout} loading={isLoading} color="khaki">Logout</LoadingButton>
     )
 }
