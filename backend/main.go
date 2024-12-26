@@ -10,7 +10,6 @@ import (
 	"github.com/casbin/casbin/v2"
 	pgadapter "github.com/casbin/casbin-pg-adapter"
 	"github.com/go-pg/pg/v10"
-	"github.com/quasoft/memstore"
 )
 
 func main() {
@@ -43,13 +42,6 @@ func main() {
 		rootLogger.Info("VALIDATOR-INSTANTIATED")
 	}
 
-	// TODO: create env file to set authentication (hashing/signing) & encryption keys
-	sessionStore := memstore.NewMemStore(
-		[]byte("authkey123"),
-		[]byte("enckey12341234567890123456789012"),
-	)
-	rootLogger.Info("SESSION-STORE-CONNECTION-ESTABLISHED")
-
 	opts, _ := pg.ParseURL("postgres://backend:abcd1234@localhost:5433/backend?sslmode=disable")
 	db := pg.Connect(opts)
 	defer db.Close()
@@ -74,7 +66,7 @@ func main() {
 		rootLogger.Info("AUTHORIZATION-POLICY-LOADED")
 	}
 
-	router := routes.NewRouter(postgres, universalTranslator, validate, rootLogger, sessionStore, authEnforcer)
+	router := routes.NewRouter(postgres, universalTranslator, validate, rootLogger, authEnforcer)
 
 	rootLogger.Info("STARTING-UP")
 	rootLogger.Info("SERVER-STARTED", "address", listenAddress)

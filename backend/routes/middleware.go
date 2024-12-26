@@ -10,9 +10,9 @@ import (
 
 	"github.com/casbin/casbin/v2"
 	ut "github.com/go-playground/universal-translator"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
-	"github.com/gorilla/sessions"
 
 	"backend/httperror"
 	"backend/postgres"
@@ -27,6 +27,12 @@ const (
 	authenticatedUserKey
 )
 
+// Allows the updated logger to be accessed by previous middleware layers
+// This is necessary because the request context is updated by copy and not by reference
+type LoggerTransport struct {
+	Logger *Logger
+}
+
 // Creates a request-specific logger & adds it to the request context
 func setRequestLogger(rootLogger *Logger) mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
@@ -34,7 +40,7 @@ func setRequestLogger(rootLogger *Logger) mux.MiddlewareFunc {
 			requestId := uuid.New().String()
 			requestLogger := rootLogger.With("requestId", requestId, "clientIp", r.RemoteAddr, "url", r.URL.Path, "method", r.Method)
 
-			r = r.WithContext(context.WithValue(r.Context(), requestLoggerKey, requestLogger))
+			r = r.WithContext(context.WithValue(r.Context(), requestLoggerKey, &LoggerTransport{Logger: requestLogger}))
 
 			next.ServeHTTP(w, r)
 		})
@@ -42,8 +48,8 @@ func setRequestLogger(rootLogger *Logger) mux.MiddlewareFunc {
 }
 
 func getRequestLogger(r *http.Request) *Logger {
-	requestLogger := r.Context().Value(requestLoggerKey).(*Logger)
-	return requestLogger
+	requestLoggerTransport := r.Context().Value(requestLoggerKey).(*LoggerTransport)
+	return requestLoggerTransport.Logger
 }
 
 // Implementation of http.ResponseWriter so the response status is recorded for logging purposes too!
@@ -158,31 +164,43 @@ func getTranslator(r *http.Request) ut.Translator {
 	return translator
 }
 
-func authenticateUser(sessionStore sessions.Store) mux.MiddlewareFunc {
-	return func(next http.Handler) http.Handler {
+func authenticateUser(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			session, err := sessionStore.Get(r, authSessionName)
-			if err != nil {
+			var token *jwt.Token
+			var loggedIn bool
+
+			authCookie, err := r.Cookie(authCookieName)
+			if err == http.ErrNoCookie {
+				loggedIn = false
+			} else if err != nil {
 				sendToErrorHandlingMiddleware(httperror.NewInternalServerError(err), r)
 				return
+			} else {
+				// Parse the token with the secret key
+				token, err = jwt.Parse(authCookie.Value, func(token *jwt.Token) (interface{}, error) {
+					return secretKey, nil
+				})
+				if err != nil {
+					sendToErrorHandlingMiddleware(httperror.NewInternalServerError(err), r)
+					return
+				}
+
+				loggedIn = token.Valid
 			}
 
-			var user postgres.User
-			if _, ok := session.Values["username"].(string); !ok || session.ID == "" {
-				// If the session ID is empty, the user does not have an existing session
-				// If the session ID was found but its values have been deleted, the session is invalid & user is not authenticated
-				user = postgres.User{
-					Username: "", // Usernames cannot be empty so it is safe to use an empty username for non-logged in users
+
+			user := postgres.User{
+				Username: "", // Usernames cannot be empty so it is safe to use an empty username for non-logged in users
+			}
+			if loggedIn {
+				username, err := token.Claims.GetSubject()
+				if err != nil {
+					sendToErrorHandlingMiddleware(httperror.NewInternalServerError(err), r)
+					return
 				}
 
-				// If the user attempts to use a deleted session, log a warning (security reasons)
-				if session.ID != "" && !ok {
-					reqLogger := getRequestLogger(r)
-					reqLogger.Warn("DELETED-SESSION-USED", "sessionId", session.ID)
-				}
-			} else {
 				user = postgres.User{
-					Username: session.Values["username"].(string),
+					Username: username,
 				}
 			}
 
@@ -192,11 +210,12 @@ func authenticateUser(sessionStore sessions.Store) mux.MiddlewareFunc {
 			// This way, activity can be tracked on both a user basis
 			reqLogger := getRequestLogger(r)
 			reqLoggerWithUserID := reqLogger.With("username", user.Username)
-			r = r.WithContext(context.WithValue(r.Context(), requestLoggerKey, reqLoggerWithUserID))
+			if loggerTransport, ok := r.Context().Value(requestLoggerKey).(*LoggerTransport); ok {
+				loggerTransport.Logger = reqLoggerWithUserID
+			}
 
 			next.ServeHTTP(w, r)
 		})
-	}
 }
 
 func getAuthenticatedUser(r *http.Request) postgres.User {
