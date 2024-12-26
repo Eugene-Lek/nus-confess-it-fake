@@ -11,16 +11,11 @@ const API_VERSION = 1
 
 interface Config {
     BACKEND_BASE_URL: string,
-    DEFAULT_FETCH_PROPS: RequestInit
+    AUTH_COOKIE_NAME: string
 }
 
 
 export const config: Config = {
     BACKEND_BASE_URL: `${BACKEND_SERVER_PROTOCOL}://${BACKEND_SERVER_HOST}:${BACKEND_SERVER_PORT}/api/v${API_VERSION}`,
-    DEFAULT_FETCH_PROPS: {
-        credentials: 'include',
-        headers: {
-            "Content-Type": "application/json",
-        },
-    }
+    AUTH_COOKIE_NAME: "auth"
 }
