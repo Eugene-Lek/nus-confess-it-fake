@@ -1,4 +1,4 @@
-import { config } from '@/config'
+import { config } from '../../../env'
 
 export function loggedIn(username: string) {
   if (typeof localStorage != undefined) {
