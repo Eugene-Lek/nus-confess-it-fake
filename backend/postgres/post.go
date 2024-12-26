@@ -11,16 +11,17 @@ import (
 )
 
 type Post struct {
-	Id        string
-	Title     string
-	Body      string
-	Tags      []string
-	Author    string
-	Status    string
-	Likes     int
-	Dislikes  int
-	CreatedAt string
-	UpdatedAt string
+	Id        string `json:"id"`
+	Title     string `json:"title"`
+	Body      string `json:"body"`
+	Tags      []string `json:"tags"`
+	Author    string `json:"author"`
+	Status    string `json:"status"`
+	Likes     int `json:"likes"`
+	Dislikes  int `json:"dislikes"`
+	CreatedAt string `json:"createdAt"`
+	UpdatedAt string `json:"updatedAt"`
+	UserVote      string   `json:"userVote"`	
 }
 
 type PostVote struct {
@@ -67,15 +68,16 @@ func (postgres *PostgresStore) CreatePost(post Post) error {
 	return nil
 }
 
-func (postgres *PostgresStore) GetPostById(postId string) (*Post, error) {
+func (postgres *PostgresStore) GetPostById(username string, postId string) (*Post, error) {
 	var post Post
+	var userVote sql.NullString
 
 	// Use a subquery to aggregate the tags, likes, and dislikes
 	// Then join the result with the post table to get the other details of the posts
 	// Note 1: Left join is used for both joins as a post may not have any tags nor votes
 	query := `SELECT post.id, post.author, post.title, post.body, p.tags, post.status,
 					  p.likes, p.dislikes,
-					  post.created_at, post.updated_at
+					  post.created_at, post.updated_at, post_vote.vote
 			  FROM (
 			  		SELECT post.id AS id, 
 							array_remove(array_agg(DISTINCT post_tag.tag), NULL) AS tags, 
@@ -83,14 +85,16 @@ func (postgres *PostgresStore) GetPostById(postId string) (*Post, error) {
 					  		COUNT(case when post_vote.vote = 'Dislike' then 1 else null end) AS dislikes
 			   		FROM post
 			   		LEFT JOIN post_tag ON post.id = post_tag.post_id
-					LEFT JOIN post_vote ON post.id= post_vote.post_id
+					LEFT JOIN post_vote ON post.id = post_vote.post_id
 			   		WHERE post.id = $1
 			   		GROUP BY id
-			   ) AS p
-			   INNER JOIN post ON post.id = p.id`
-	err := postgres.db.QueryRow(query, postId).Scan(
+			   ) AS p				
+			   INNER JOIN post ON post.id = p.id
+			   LEFT JOIN post_vote ON p.id = post_vote.post_id 
+			   	    AND post_vote.viewer = $2`
+	err := postgres.db.QueryRow(query, postId, username).Scan(
 			&post.Id, &post.Author, &post.Title, &post.Body, pq.Array(&post.Tags), &post.Status, 
-			&post.Likes, &post.Dislikes, &post.CreatedAt, &post.UpdatedAt)
+			&post.Likes, &post.Dislikes, &post.CreatedAt, &post.UpdatedAt, &userVote)
 	
 	if err == sql.ErrNoRows {
 		return nil, nil
@@ -100,6 +104,7 @@ func (postgres *PostgresStore) GetPostById(postId string) (*Post, error) {
 	if (err != nil) {
 		return nil, err
 	} else {
+		post.UserVote = userVote.String
 		return &post, nil
 	}
 }
@@ -107,17 +112,21 @@ func (postgres *PostgresStore) GetPostById(postId string) (*Post, error) {
 // Get posts by author, status, search query, tags, and who liked them (all optional) 
 // and sort by either newest, mosts likes, or relevance (default is by relevance)
 // (relevance is by search query. If search query is empty, then relevance is by tag)
-func (postgres *PostgresStore) GetPosts(author string, status string, searchQuery string, tags []string, likedBy string, sortBy string) ([]Post, error) {
+func (postgres *PostgresStore) GetPosts(username string, author string, statuses []string, searchQuery string, tags []string, likedBy string, sortBy string) ([]Post, error) {
 	
-	// Use a subquery to aggregate the tags, likes, and dislikes
+	// Use a subquery to aggregate the tags, likes, dislikes, and the user's vote
 	// Then join the result with the post table to get the other details of the posts
-	// Note 1: Left join is used for both joins as a post may not have any tags nor votes
-	// Note 2: An intermediate column called "tags_lowercased" is created to enable 
+	// Note 1: In the subquery, group by must be applied to all 3 fields in order to select 
+	//         post_vote.vote for each user
+	// Note 2: In the subquery, outer join is used because the user may not have voted on the post
+	// Note 2: Left join is used for both joins as a post may not have any tags nor votes
+	// Note 3: An intermediate column called "tags_lowercased" is created to enable 
 	//         case-insensitive filtering by tags. It is supported by an index
 
 	query := `SELECT post.id, post.author, post.title, post.body, p.tags, post.status,
 						p.likes, p.dislikes,
-						post.created_at, post.updated_at
+						post.created_at, post.updated_at,
+						post_vote.vote
 			  FROM (
 			  		SELECT post.id AS id, 
 							array_remove(array_agg(DISTINCT post_tag.tag), NULL) AS tags,
@@ -127,23 +136,25 @@ func (postgres *PostgresStore) GetPosts(author string, status string, searchQuer
 							array_agg(post_vote.viewer) AS likers
 			   		FROM post
 			   		LEFT JOIN post_tag ON post.id = post_tag.post_id
-					LEFT JOIN post_vote ON post.id= post_vote.post_id
+					LEFT JOIN post_vote ON post.id= post_vote.post_id				
 			   		GROUP BY id
 			   ) AS p
 			   INNER JOIN post ON post.id = p.id
+			   LEFT JOIN post_vote ON p.id = post_vote.post_id 
+			   	    AND post_vote.viewer = $1			   
 			   WHERE 1 = 1`
 
 	// Append conditions to the query based on the arguments provided
-	conditionCount := 1
-	conditions := []any{}
+	conditionCount := 2
+	conditions := []any{username}
 	if (author != "") {
 		query = query + fmt.Sprintf(" AND post.author = $%v", conditionCount)
 		conditions = append(conditions, author)
 		conditionCount += 1
 	}
-	if (status != "") {
-		query = query + fmt.Sprintf(" AND post.status = $%v", conditionCount)
-		conditions = append(conditions, status)
+	if (len(statuses) > 0) {
+		query = query + fmt.Sprintf(" AND post.status = ANY($%v)", conditionCount)
+		conditions = append(conditions, pq.Array(statuses))
 		conditionCount += 1
 	}
 	if (strings.Trim(searchQuery, " ") != "") {
@@ -170,18 +181,22 @@ func (postgres *PostgresStore) GetPosts(author string, status string, searchQuer
 
 	// Append the corresponding "order by" statement
 	switch sortBy {
-	case "newest":
+	case "Newest":
 		query = query + " ORDER BY post.created_at DESC"
-	case "popular":
-		query = query + " ORDER BY p.likes DESC"
-	case "relevance":
+	case "Popular":
+		query = query + " ORDER BY p.likes - p.dislikes DESC"
+	case "Relevance":
 		// If search query is empty, sort by tag relevance
 		// If tags are empty, sort by newest first
 		if (searchQuery != "") {
-			query = query + fmt.Sprintf(` ORDER BY ts_rank_cd(post.textsearchable_index, plainto_tsquery(%s)) DESC`, searchQuery)
+			query = query + fmt.Sprintf(` ORDER BY ts_rank_cd(post.textsearchable_index, plainto_tsquery($%v)) DESC`, conditionCount)
+			conditions = append(conditions, searchQuery)
+			conditionCount += 1
 		} else if (len(tags) > 0) {
-			query = query + fmt.Sprintf(` ORDER BY cardinality(p.tags & %v)`, pq.Array(tags))
-		} else {
+			query = query + fmt.Sprintf(` ORDER BY cardinality(ARRAY(SELECT * FROM UNNEST(p.tags) WHERE UNNEST = ANY($%v)))`, conditionCount)
+			conditions = append(conditions, pq.Array(tags))
+			conditionCount += 1
+		} else { 
 			query = query + " ORDER BY post.created_at DESC"
 		}
 	default:
@@ -200,15 +215,17 @@ func (postgres *PostgresStore) GetPosts(author string, status string, searchQuer
 
 	for rows.Next() {
 		var post Post
+		var userVote sql.NullString
 
 		err := rows.Scan(
 			&post.Id, &post.Author, &post.Title, &post.Body, pq.Array(&post.Tags), &post.Status, 
-			&post.Likes, &post.Dislikes, &post.CreatedAt, &post.UpdatedAt)
+			&post.Likes, &post.Dislikes, &post.CreatedAt, &post.UpdatedAt, &userVote)
 
 		err = checkPostgresErr(err)
 		if (err != nil) {
 			return nil, err
 		} else {
+			post.UserVote = userVote.String
 			posts = append(posts, post)
 		}
 	}
@@ -216,26 +233,10 @@ func (postgres *PostgresStore) GetPosts(author string, status string, searchQuer
 	return posts, nil
 }
 
-func (postgres *PostgresStore) UpdatePost(post Post) error {
-	tx, err := postgres.db.Begin()
-	if err != nil {
-		return httperror.NewInternalServerError(err)
-	}
-	defer tx.Rollback()
-
-	// Update the existing row in the post table
-	query := `
-		UPDATE post SET title = $1, body = $2, status = $3, updated_at = $4 
-		WHERE id = $5`
-	_, err = tx.Exec(query, post.Title, post.Body, post.Status, time.Now(), post.Id)
-	err = checkPostgresErr(err)
-	if err != nil {
-		return err
-	}
-
+func updateTags(post Post, tx *sql.Tx) error {
 	// Delete the current post-tag mappings and create new ones
-	query = `DELETE FROM post_tag WHERE post_id = $1`
-	_, err = tx.Exec(query, post.Id)
+	query := `DELETE FROM post_tag WHERE post_id = $1`
+	_, err := tx.Exec(query, post.Id)
 	err = checkPostgresErr(err)
 	if err != nil {
 		return err
@@ -250,6 +251,63 @@ func (postgres *PostgresStore) UpdatePost(post Post) error {
 		if err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (postgres *PostgresStore) UpdatePost(post Post) error {
+	tx, err := postgres.db.Begin()
+	if err != nil {
+		return httperror.NewInternalServerError(err)
+	}
+	defer tx.Rollback()
+
+	// Update the existing row in the post table
+	query := `
+		UPDATE post SET title = $1, body = $2, updated_at = $3 
+		WHERE id = $4`
+	_, err = tx.Exec(query, post.Title, post.Body, time.Now(), post.Id)
+	err = checkPostgresErr(err)
+	if err != nil {
+		return err
+	}
+
+	err = updateTags(post, tx)
+	if err != nil {
+		return err
+	}
+
+	// Commit the transaction if all queries are successful
+	err = tx.Commit()
+	if err != nil {
+		return httperror.NewInternalServerError(err)
+	}
+
+	return nil
+}
+
+func (postgres *PostgresStore) UpdateDraftToPost(post Post) error {
+	tx, err := postgres.db.Begin()
+	if err != nil {
+		return httperror.NewInternalServerError(err)
+	}
+	defer tx.Rollback()
+
+	// Update the existing row in the post table
+	query := `
+		UPDATE post SET title = $1, body = $2, status = 'Published', created_at = $3, updated_at = $4
+		WHERE id = $5`
+	now := time.Now()
+	_, err = tx.Exec(query, post.Title, post.Body, now, now, post.Id)
+	err = checkPostgresErr(err)
+	if err != nil {
+		return err
+	}
+	
+	err = updateTags(post, tx)
+	if err != nil {
+		return err
 	}
 
 	// Commit the transaction if all queries are successful
@@ -270,7 +328,7 @@ func (postgres *PostgresStore) SoftDeletePost(postId string) error {
 
 	// Set the status to 'deleted' and clear the body (retain the title for reference)
 	query := `
-		UPDATE post SET body = '', status = 'Deleted', updated_at = $1 
+		UPDATE post SET title='', body = '', status = 'Deleted', updated_at = $1 
 		WHERE id = $2`
 	_, err = tx.Exec(query, time.Now(), postId)
 	err = checkPostgresErr(err)
@@ -301,6 +359,14 @@ func (postgres *PostgresStore) UpsertPostVote(postVote PostVote) error {
 		INSERT INTO post_vote (viewer, post_id, vote) VALUES ($1, $2, $3)
 		ON CONFLICT(viewer, post_id) DO UPDATE SET vote = $3`
 	_, err := postgres.db.Exec(query, postVote.Viewer, postVote.PostId, postVote.Vote)
+	return checkPostgresErr(err)
+}
+
+func (postgres *PostgresStore) DeletePostVote(postVote PostVote) error {
+	// Create the vote or update it if it already exists
+	query := `
+		DELETE FROM post_vote WHERE viewer = $1 AND post_id = $2`
+	_, err := postgres.db.Exec(query, postVote.Viewer, postVote.PostId)
 	return checkPostgresErr(err)
 }
 
