@@ -1,4 +1,4 @@
-import { config } from '@/config'
+import { config } from '../../env'
 import { errorOccured } from '@/features/popups/popup_slice'
 import { createApi, fetchBaseQuery, FetchBaseQueryError } from '@reduxjs/toolkit/query/react'
 import { AppDispatch } from './store'
