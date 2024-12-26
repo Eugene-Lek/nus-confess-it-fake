@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   output: 'export',
   transpilePackages: ['@mdxeditor/editor'],
-  reactStrictMode: true,
+  reactStrictMode: false,
   webpack: (config) => {
     // this will override the experiments
     config.experiments = { ...config.experiments, topLevelAwait: true }
