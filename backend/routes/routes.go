@@ -64,14 +64,14 @@ func NewRouter(postgres *postgres.PostgresStore, universalTranslator *ut.Univers
 	postRouter.HandleFunc("/{postId}", router.handleDeletePost).Methods("DELETE")
 	postRouter.HandleFunc("/{postId}/comments", router.handleGetCommentsByPostId).Methods("GET")
 	postRouter.HandleFunc("/{postId}/vote", router.handleUpsertPostVote).Methods("PUT") // Endpoint for voting on a post
-	postRouter.HandleFunc("/{postId}/vote", router.handleUpsertPostVote).Methods("DELETE") // Endpoint for voting on a post
+	postRouter.HandleFunc("/{postId}/vote", router.handleDeletePostVote).Methods("DELETE") // Endpoint for voting on a post
  
 	commentRouter := apiRouter.PathPrefix("/comments").Subrouter()
 	commentRouter.HandleFunc("/{commentId}", router.handleCreateComment).Methods("POST")
 	commentRouter.HandleFunc("/{commentId}", router.handleUpdateComment).Methods("PUT")
 	commentRouter.HandleFunc("/{commentId}", router.handleDeleteComment).Methods("DELETE")
 	commentRouter.HandleFunc("/{commentId}/vote", router.handleUpsertCommentVote).Methods("PUT") // Endpoint for voting on a comment
-	commentRouter.HandleFunc("/{commentId}/vote", router.handleUpsertCommentVote).Methods("DELETE") // Endpoint for voting on a comment
+	commentRouter.HandleFunc("/{commentId}/vote", router.handleDeleteCommentVote).Methods("DELETE") // Endpoint for voting on a comment
 
 	router.NotFoundHandler = setRequestLogger(router.rootLogger)(errorHandling(http.HandlerFunc(router.handleNotFound))) // Custom 404 handler
 
