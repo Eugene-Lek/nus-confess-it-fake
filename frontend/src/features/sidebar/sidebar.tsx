@@ -9,6 +9,7 @@ import { FC } from "react";
 import { useRouter } from "next/router";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { clickedLogin } from "../popups/popup_slice";
+import { userIsLoggedIn } from "../auth/auth";
 
 const nav = [
     {label: "Home", path: "/", icon: <HomeIcon style={{ fill: "#51361a" }} />},
@@ -23,17 +24,8 @@ const nav = [
 export const SideBar: FC = () => {
     const router = useRouter() 
 
-    // If the user clicked any page except the home page and has not logged in, 
-    // redirect them to the login popup
-    const authenticated = useAppSelector((state) => state.session.authenticated)
-    const dispatch = useAppDispatch()
     const onClick = (path: string) => {
-      if (path != "/" && !authenticated) {
-          dispatch(clickedLogin())
-          return
-      }
-
-      router.push(path)
+       router.push(path)
     }
 
     return (
