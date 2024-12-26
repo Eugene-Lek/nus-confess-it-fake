@@ -1,56 +1,45 @@
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { Button, DialogActions, DialogContent, DialogContentText, DialogTitle, Link, TextField } from "@mui/material";
+import { useAppDispatch } from "@/redux/hooks";
+import { DialogActions, DialogContent, DialogContentText, DialogTitle, Link, TextField } from "@mui/material";
 import { FC, useState } from "react";
-import { clickedSignup, clickedSubmit, closed, errorOccured } from "./popup_slice";
-import { AppDispatch } from "@/redux/store";
-import { loggedIn } from "../global/session_slice";
+import { clickedSignup, closed } from "./popup_slice";
+import { loggedIn } from "../auth/auth";
 import { LoadingButton } from "@mui/lab";
-
-interface Login {
-    username: string
-    password: string
-}
-
-export const submitLogin = async(event: React.FormEvent<HTMLFormElement>, dispatch: AppDispatch) => {
-    event.preventDefault();
-    dispatch(clickedSubmit())
-
-    const formData = new FormData(event.currentTarget);
-    const formJson = Object.fromEntries((formData as any).entries());
-
-    // Make API to authenticate user & create session
-    await new Promise(r => setTimeout(r, 2000));
-    dispatch(loggedIn(formJson.username))
-    dispatch(closed())
-    /*
-    const response = await fetch("", {
-        method: "POST",
-        body: JSON.stringify(formJson)
-    })
-    if (response.ok) {
-        // update login state
-        dispatch(loggedIn())
-        dispatch(closed())
-    } else {
-        const response_data = await response.json()
-        if (response_data.code == 401) {
-            dispatch(errorOccured("Invalid username or password"))
-        } else {
-            dispatch(errorOccured(response_data.message))
-        }
-    }
-    */
-  }
-
+import { useLoginMutation } from "./api_slice";
+import { useRouter } from "next/router";
+import { PasswordField } from "./password_field";
 
 export const Login: FC = () => {
-    const error = useAppSelector((state) => state.popup.error)
-    const loading = useAppSelector((state) => state.popup.loading)
     const dispatch = useAppDispatch()
     const handleClose = () => dispatch(closed())
 
+    const [error, setError] = useState("")
+    const [login,  { isLoading }] = useLoginMutation()
+    const router = useRouter()
+    const onSubmit = async(event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault(); 
+    
+        const formData = new FormData(event.currentTarget);
+        const formJson = Object.fromEntries((formData as any).entries());
+    
+        try {
+            await login({username: formJson.username, password: formJson.password}).unwrap()
+
+            // update login state
+            loggedIn(formJson.username)
+            dispatch(closed())
+            router.reload() // Reload the page to reflect the new authenticated status
+
+        } catch (err: any) {
+            if (err.status == 401) {
+                setError("Invalid username or password")
+            } else {
+                setError(err.data.message)
+            }
+        }
+    }
+
     return (
-        <>
+        <form onSubmit={onSubmit}>
             <DialogTitle>Login</DialogTitle>
             <DialogContent>
             <TextField
@@ -63,24 +52,21 @@ export const Login: FC = () => {
                 fullWidth
                 size="small"
                 variant="standard"
-                disabled={loading}
+                disabled={isLoading}
             />
-            <TextField
+            <PasswordField
                 required
                 margin="dense"
                 id="password"
                 name="password"
                 label="Password"
-                type="password"
                 fullWidth
                 size="small"
                 variant="standard"
-                disabled={loading}
+                disabled={isLoading}
             />
                 <DialogContentText color="#d32f2f" fontSize={12} sx={{visibility: error ? "visible" : "hidden"}}>
-                    {/*White space is appended to the end of the errorto ensure 
-                    that the component is always inserted into the dom tree*/}
-                    {`${error} `}
+                    {`${error}`}
                 </DialogContentText>
                 <DialogContentText>{"Don't have an account? "}
                     <Link color="#000000" sx={{cursor: 'pointer'}} onClick={() => dispatch(clickedSignup())}>
@@ -89,9 +75,9 @@ export const Login: FC = () => {
                 </DialogContentText>
             </DialogContent>
             <DialogActions>
-            <LoadingButton onClick={handleClose} loading={loading}>Cancel</LoadingButton>
-            <LoadingButton type="submit" loading={loading}>Login</LoadingButton>
+            <LoadingButton onClick={handleClose} loading={isLoading}>Cancel</LoadingButton>
+            <LoadingButton type="submit" loading={isLoading}>Login</LoadingButton>
             </DialogActions>
-        </>
+        </form>
     )
 }
