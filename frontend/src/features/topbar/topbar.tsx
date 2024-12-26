@@ -10,16 +10,17 @@ import { KeywordFilter } from './keyword_filter';
 import { TagFilter } from './tag_filter';
 import { useAppSelector } from '@/redux/hooks';
 import { LogoutButton } from './logout_button';
+import { userIsLoggedIn } from '../auth/auth';
 
 
 export const Topbar: FC<PropsWithChildren> = () => {
-    const authenticated = useAppSelector((state) => state.session.authenticated)
+    const authenticated = userIsLoggedIn()
 
     return (
         <>
             <AppBar position='fixed' sx={{borderColor: "#AEAEAE", backgroundColor: "white", zIndex: (theme) => theme.zIndex.drawer + 1}}>
                 <Toolbar sx={{display: 'flex', justifyContent: 'space-between'}}>
-                    <Typography variant='h5' color="space">NUSConfessIT</Typography>
+                    <Typography variant='h5' color="space">NUSConfessITFake</Typography>
                     <Box sx={{ display: 'flex', gap: "20px", alignItems: "center"}}>
                         <KeywordFilter/>
                         <TagFilter/>
