@@ -1,7 +1,11 @@
+import { useAppDispatch } from "@/redux/hooks"
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material"
+import { sortByUpdated } from "../topbar/filter_slice"
 
 
 export const SortBySelect = () => {
+    const dispatch = useAppDispatch()
+
     return (
         <FormControl sx={{marginTop: "25px", mx: "40px"}}>
             <InputLabel id="sortBy">Sort By</InputLabel>
@@ -10,12 +14,12 @@ export const SortBySelect = () => {
                 label="Sort by"
                 size="small"
                 sx={{width: "200px"}}
-                defaultValue="newest"
-                //onChange={handleChange}
+                defaultValue="Newest"
+                onChange={(e) => dispatch(sortByUpdated(e.target.value))}
             >
-                <MenuItem value={"newest"}>Newest</MenuItem>
-                <MenuItem value={"relevance"}>Relevance</MenuItem>
-                <MenuItem value={"popular"}>Popular</MenuItem>
+                <MenuItem value={"Newest"}>Newest</MenuItem>
+                <MenuItem value={"Relevance"}>Relevance</MenuItem>
+                <MenuItem value={"Popular"}>Popular</MenuItem>
             </Select>
         </FormControl>
     )
