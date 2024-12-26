@@ -7,7 +7,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var secretKey = []byte("secret")
+var AuthSecretKey []byte
 const authCookieName = "auth"
 
 func createAuthCookie(username string) (*http.Cookie, error) {	
@@ -18,7 +18,7 @@ func createAuthCookie(username string) (*http.Cookie, error) {
 		"iat": time.Now().Unix(),
 	})
 
-	signedJWT, err := claims.SignedString(secretKey)
+	signedJWT, err := claims.SignedString(AuthSecretKey)
 	if err != nil {
 		return nil, err
 	}
