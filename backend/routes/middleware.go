@@ -178,7 +178,7 @@ func authenticateUser(next http.Handler) http.Handler {
 			} else {
 				// Parse the token with the secret key
 				token, err = jwt.Parse(authCookie.Value, func(token *jwt.Token) (interface{}, error) {
-					return secretKey, nil
+					return AuthSecretKey, nil
 				})
 				if err != nil {
 					sendToErrorHandlingMiddleware(httperror.NewInternalServerError(err), r)

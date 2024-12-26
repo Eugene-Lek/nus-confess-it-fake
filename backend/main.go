@@ -7,9 +7,10 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/casbin/casbin/v2"
 	pgadapter "github.com/casbin/casbin-pg-adapter"
+	"github.com/casbin/casbin/v2"
 	"github.com/go-pg/pg/v10"
+	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -17,14 +18,26 @@ func main() {
 	logOutputMedium := os.Stdout
 	rootLogger := routes.NewRootLogger(logOutputMedium)
 
-	listenAddress := "localhost:5000"
-	dbConnString := "host=localhost port=5433 user=backend password=abcd1234 dbname=backend sslmode=disable"
+	// Load environment variables
+	err := godotenv.Load()
+	if err != nil {
+		rootLogger.Fatal("LOADING-ENV-VARS-FAILED", "errorMessage", fmt.Sprintf("Error loading .env file : %s", err))
+	}	
+	routes.AuthSecretKey = []byte(os.Getenv("AUTH_SECRET_KEY"))
+	backendHost := os.Getenv("BACKEND_HOST")
+	backendPort := os.Getenv("BACKEND_PORT")
+	DbHost := os.Getenv("DB_HOST")
+	DbPort := os.Getenv("DB_PORT")
+	DbUserPassword := os.Getenv("DB_USER_PASSWORD")
+
+	listenAddress := fmt.Sprintf("%v:%v", backendHost, backendPort)
+	dbConnString := fmt.Sprintf("host=%v port=%v user=backend password=%v dbname=backend sslmode=disable", DbHost, DbPort, DbUserPassword)
 
 	postgres, err := postgres.NewPostgresStore(dbConnString)
 	if err != nil {
 		rootLogger.Fatal("DB-CONNECTION-FAILED", "errorMessage", fmt.Sprintf("Could not connect to database: %s", err))
 	} else {
-		opts, _ := pg.ParseURL("postgres://backend:abcd1234@localhost:5433/backend?sslmode=disable")
+		opts, _ := pg.ParseURL(fmt.Sprintf("postgres://backend:%v@%v:%v/backend?sslmode=disable", DbUserPassword, DbHost, DbPort))
 		rootLogger.Info("DB-CONNECTION-ESTABLISHED", "user", opts.User, "host", opts.Addr, "database", opts.Database)
 	}
 
