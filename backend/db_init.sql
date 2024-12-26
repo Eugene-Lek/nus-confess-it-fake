@@ -16,7 +16,6 @@ ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT SELECT, INSERT
 
 -- Import necessary extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-CREATE EXTENSION IF NOT EXISTS "intarray";
 
 -- Enums
 CREATE TYPE STATUS AS ENUM (
@@ -83,6 +82,8 @@ CREATE TABLE IF NOT EXISTS comment (
     author VARCHAR(20) NOT NULL,
     post_id UUID NOT NULL,
     parent_id UUID,
+    parent_author VARCHAR(20),
+    parent_body VARCHAR(10000),
     status STATUS NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -162,13 +163,15 @@ VALUES (
     'Published',
     '2024-12-10 11:23:30.810259+00'
 );
-INSERT INTO comment (id, body, author, post_id, parent_id, status, created_at)
+INSERT INTO comment (id, body, author, post_id, parent_id, parent_author, parent_body, status, created_at)
 VALUES (
     '5fc28bdf-a64b-4dce-8208-d32dcf7de4ba',
     'That''s what I''m doing! 10/10 recommend but after SEP',
     'Spike_the_dog',
     'f6d3af06-bdf8-428d-9754-b11b81bae0ac',
     '249a5d11-7d35-4769-af02-3df49a434005',
+    'Tom_the_cat',
+    'I personally think overloading with CS/CU mods while doing more internships (LOA/Credit bearing) would be more useful.',    
     'Published',
     '2024-12-10 12:14:30.810259+00'
 );
@@ -235,13 +238,15 @@ VALUES (
     'Published',
     '2024-12-09 18:13:30.810259+00'
 );
-INSERT INTO comment (id, body, author, post_id, parent_id, status, created_at)
+INSERT INTO comment (id, body, author, post_id, parent_id, parent_author, parent_body, status, created_at)
 VALUES (
     '0dd4fe2a-fad5-44b8-adb8-c8ab6f6b2818',
     'PoE 2?',
     'Spike_the_dog',
     'fbd21d94-77f0-4305-8f37-2c84ffda5dd5',
     '7b6c8971-ac87-4a71-9052-8af42d766ced',
+    'Tom_the_cat',    
+    'Gaming',    
     'Published',
     '2024-12-09 18:14:30.810259+00'
 ),
@@ -251,6 +256,8 @@ VALUES (
     'Nibbles_the_baby',
     'fbd21d94-77f0-4305-8f37-2c84ffda5dd5',
     '7b6c8971-ac87-4a71-9052-8af42d766ced',
+    'Tom_the_cat',    
+    'Gaming',       
     'Published',
     '2024-12-09 18:19:30.810259+00'
 ),
@@ -260,6 +267,8 @@ VALUES (
     'Jerry_the_mouse',
     'fbd21d94-77f0-4305-8f37-2c84ffda5dd5',
     '7b6c8971-ac87-4a71-9052-8af42d766ced',
+    'Tom_the_cat',    
+    'Gaming',       
     'Published',
     '2024-12-09 18:20:30.810259+00'
 );
@@ -272,17 +281,19 @@ VALUES (
     'Published',
     '2024-12-09 16:59:30.810259+00'
 );
-INSERT INTO comment (id, body, author, post_id, parent_id, status, created_at)
+INSERT INTO comment (id, body, author, post_id, parent_id, parent_author, parent_body, status, created_at)
 VALUES (
     '65f0624c-7aa9-4812-bba0-1ad94059d6df',
     'No more Christmas mood becos of 24th Dec',
     'Nibbles_the_baby',
     'fbd21d94-77f0-4305-8f37-2c84ffda5dd5',
     '8346828d-b0f6-4105-bb7c-985655a3f34b',
+    'Jerry_the_mouse',    
+    'Christmas MOOD',    
     'Published',
     '2024-12-09 17:01:30.810259+00'
 );
 
 --- Docker commands
---- docker run --name dev -p 5433:5432 -e POSTGRES_PASSWORD=abcd1234 -e POSTGRES_DB=backend -v C:\Users\lekwc\Documents\Coding\Projects\CVWO Assignment\nus-confess-it\backend\db_init.sql:/docker-entrypoint-initdb.d/init.sql -d postgres 
+--- docker run --name dev -p 5433:5432 -e POSTGRES_PASSWORD=abcd1234 -e POSTGRES_DB=backend -v C:\Users\lekwc\Documents\Coding\Projects\CVWO Assignment\nus-confess-it-fake\backend\db_init.sql:/docker-entrypoint-initdb.d/init.sql -d postgres 
 --- docker exec -it dev psql -U backend
