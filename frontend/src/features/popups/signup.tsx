@@ -1,34 +1,17 @@
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { Button, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@mui/material";
-import { FC } from "react";
-import { clickedSubmit, closed } from "./popup_slice";
-import { AppDispatch } from "@/redux/store";
+import { FC, useState } from "react";
+import { closed } from "./popup_slice";
 import Yup from "@/validation/yup";
 import { FormikProps, useFormik } from "formik";
 import { hasError } from "@/validation/helpers";
 import { LoadingButton } from "@mui/lab";
-
-export const submitSignup = async(event: React.FormEvent<HTMLFormElement>, dispatch: AppDispatch) => {
-    event.preventDefault();
-    dispatch(clickedSubmit())
-
-    const formData = new FormData(event.currentTarget);
-    const formJson = Object.fromEntries((formData as any).entries());
-    
-    try {
-      await fetch("", {
-          method: "POST",
-          body: JSON.stringify(formJson)
-      })
-    } catch {
-    }
-    
-    dispatch(closed())
-  }
+import { loggedIn } from "../auth/auth";
+import { useCreateUserMutation } from "./api_slice";
+import { useRouter } from "next/router";
+import { PasswordField } from "./password_field";
 
 export const SignUp: FC = () => {
-    const error = useAppSelector((state) => state.popup.error)
-    const loading = useAppSelector((state) => state.popup.loading)
     const dispatch = useAppDispatch()
     const handleClose = () => dispatch(closed())
 
@@ -64,10 +47,37 @@ export const SignUp: FC = () => {
         initialValues: {username: "", password: "", confirmPassword: ""}
     })
 
-    console.log(formState.errors)
+    const [error, setError] = useState("")
+    const [createUser,  { isLoading }] = useCreateUserMutation()
+    const router = useRouter()
+    const onSubmit = async(event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+    
+        const formData = new FormData(event.currentTarget);
+        const formJson = Object.fromEntries((formData as any).entries());
+        const username = formJson.username
+    
+        try {
+            await createUser({username: formJson.username, password: formJson.password}).unwrap()
+
+            // update login state
+            loggedIn(username)
+            dispatch(closed())
+            router.reload() // Reload the page to reflect the new authenticated status
+
+        } catch (err: any) {
+            if (err.data.code == "INVALID-INPUT-ERROR") {
+                setError("One or more inputs were invalid")
+            } else if (err.data.code == "UNIQUE-VIOLATION-ERROR") {
+                setError(`The username '${username}' already exists`)
+            } else {
+                setError(err.data.message)
+            }
+        }
+    }
 
     return (
-        <>
+        <form onSubmit={onSubmit}>
             <DialogTitle>Sign up</DialogTitle>
             <DialogContent>
             <TextField
@@ -83,12 +93,11 @@ export const SignUp: FC = () => {
                 helperText={hasError(formState, "username") ? String(formState.errors["username"]) : ""}
                 {...formState.getFieldProps("username")} // Sets the onChange function to a function that updates the form state
             />
-            <TextField
+            <PasswordField
                 required
                 margin="dense"
                 id="password"
                 label="Password"
-                type="password"
                 fullWidth
                 size="small"
                 variant="standard"
@@ -96,12 +105,11 @@ export const SignUp: FC = () => {
                 helperText={hasError(formState, "password")? String(formState.errors["password"]) : ""}
                 {...formState.getFieldProps("password")} // Sets the onChange function to a function that updates the form state
             />
-            <TextField
+            <PasswordField
                 required
                 margin="dense"
                 id="confirmPassword"
                 label="Confirm Password"
-                type="password"
                 fullWidth
                 size="small"
                 variant="standard"
@@ -109,16 +117,16 @@ export const SignUp: FC = () => {
                 helperText={hasError(formState, "confirmPassword")? String(formState.errors["confirmPassword"]) : ""}
                 {...formState.getFieldProps("confirmPassword")} // Sets the onChange function to a function that updates the form state
             />
-            <DialogContentText color="#FF0000" fontSize={12} sx={{visibility: error ? "visible" : "hidden"}}>
-                {/*White space is appended to the end of the errorto ensure 
+            <DialogContentText color="#d32f2f" fontSize={12} sx={{visibility: error ? "visible" : "hidden"}}>
+                {/*White space is appended to the end of the error to ensure 
                 that the component is always inserted into the dom tree*/}
                 {`${error} `}
             </DialogContentText>
             </DialogContent>
             <DialogActions>
-            <LoadingButton onClick={handleClose} loading={loading}>Cancel</LoadingButton>
-            <LoadingButton type="submit" loading={loading} disabled={Object.keys(formState.errors).length > 0}>Sign Up</LoadingButton>
+            <LoadingButton onClick={handleClose} loading={isLoading}>Cancel</LoadingButton>
+            <LoadingButton type="submit" loading={isLoading} disabled={Object.keys(formState.errors).length > 0}>Sign Up</LoadingButton>
             </DialogActions>
-        </>
+        </form>
     )
 }
