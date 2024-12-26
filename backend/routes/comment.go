@@ -12,19 +12,15 @@ import (
 // The function "getComments" is an abstraction for all route handlers that involve fetching comments.
 // It is not directly attached to any endpoint.
 type getCommentsRequestInput struct {
-	PostId string `validate:"required,notBlank,uuid4" name:"post id"`
+	PostId string `validate:"omitempty,notBlank,uuid4" name:"post id"`
 	Query string `validate:"omitempty,notBlank" name:"query"`
 	Author string `validate:"omitempty,notBlank" name:"author"`
 	LikedBy string `validate:"omitempty,notBlank" name:"liked by"`
-	Status string `validate:"omitempty,oneof=Draft Published Deleted" name:"status"`
-	SortBy string `validate:"omitempty,oneof=newest popular relevance" name:"sort by"`
+	Statuses []string `validate:"omitempty,dive,oneof=Draft Published Deleted" name:"status"`
+	SortBy string `validate:"omitempty,oneof=Newest Oldest Popular Relevance" name:"sort by"`
 }
 
 func (router *Router) getComments(w http.ResponseWriter, r *http.Request, input getCommentsRequestInput) {
-	type responseBody struct {
-		Comments []postgres.Comment `json:"comments"`
-	}
-
 	//Input validation
 	translator := getTranslator(r)
 	err := validateStruct(router.validate, translator, input)
@@ -34,29 +30,28 @@ func (router *Router) getComments(w http.ResponseWriter, r *http.Request, input 
 	}
 
 	// Make DB query
-	comments, err := router.postgresStore.GetComments(input.PostId, input.Author, input.Status, input.Query, input.LikedBy, input.SortBy)
+	user := getAuthenticatedUser(r)
+	comments, err := router.postgresStore.GetComments(user.Username, input.PostId, input.Author, input.Statuses, input.Query, input.LikedBy, input.SortBy)
 	if err != nil {
 		sendToErrorHandlingMiddleware(err, r)
 		return
 	}
 
 	requestLogger := getRequestLogger(r)
-	requestLogger.Info("COMMENTS-FETCHED", "commentId", input.PostId, "author",  input.Author, "status", input.Status, "query", input.Query, "likedBy", input.LikedBy, "sortBy", input.SortBy)
+	requestLogger.Info("COMMENTS-FETCHED", "commentId", input.PostId, "author",  input.Author, "status", input.Statuses, "query", input.Query, "likedBy", input.LikedBy, "sortBy", input.SortBy)
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Add("content-type", "application/json")
 
-	resBody := responseBody{
-		Comments: comments,
-	}
-	json.NewEncoder(w).Encode(resBody)
+	json.NewEncoder(w).Encode(comments)
 }
 
 func (router *Router) handleGetCommentsByPostId(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	input := getCommentsRequestInput{
 		PostId: vars["postId"],
-		Status: "Published",
+		SortBy: "Oldest",
+		Statuses: []string{"Published", "Deleted"},
 	}
 
 	router.getComments(w, r, input)
@@ -69,7 +64,7 @@ func (router *Router) handleGetMyComments(w http.ResponseWriter, r *http.Request
 		Query: r.URL.Query().Get("query"),
 		SortBy: r.URL.Query().Get("sortBy"),
 		Author: user.Username,
-		Status: "Published", // Only show published comments
+		Statuses: []string{"Published", "Deleted"},
 	}
 
 	router.getComments(w, r, input)
@@ -82,7 +77,7 @@ func (router *Router) handleGetLikedComments(w http.ResponseWriter, r *http.Requ
 		Query: r.URL.Query().Get("query"),
 		SortBy: r.URL.Query().Get("sortBy"),
 		LikedBy: user.Username,
-		Status: "Published",
+		Statuses: []string{"Published", "Deleted"},
 	}
 
 	router.getComments(w, r, input)
@@ -94,9 +89,10 @@ func (router *Router) getCommentParams(r *http.Request) (*postgres.Comment, erro
 	type requestInput struct {
 		Id string `validate:"required,notBlank,uuid4" name:"id"`
 		Body string `validate:"required,notBlank" name:"body"`
-		Author    string `validate:"required,notBlank" name:"author"`
 		PostId string `validate:"required,notBlank,uuid4" name:"post id"`
 		ParentId string `validate:"omitempty,notBlank,uuid4" name:"parent id"`
+		ParentAuthor string `validate:"omitempty,notBlank" name:"parent author"`
+		ParentBody string `validate:"omitempty,notBlank" name:"parent body"`
 	}
 
 	var input requestInput
@@ -107,6 +103,7 @@ func (router *Router) getCommentParams(r *http.Request) (*postgres.Comment, erro
 
 	vars := mux.Vars(r)
 	input.Id = vars["commentId"]
+	fmt.Print(input)
 
 	//Input validation
 	translator := getTranslator(r)
@@ -115,15 +112,20 @@ func (router *Router) getCommentParams(r *http.Request) (*postgres.Comment, erro
 		return nil, err
 	}
 
-	// Make DB query
+	user := getAuthenticatedUser(r)
 	comment := postgres.Comment{
 		Id: input.Id,
 		Body: input.Body,
-		Author: input.Author,
+		Author: user.Username,
 		PostId: input.PostId,
-		ParentId: input.ParentId,
 	}
-
+	if (input.ParentId != "") {
+		comment.ParentComment = &postgres.Comment{
+			Id: input.ParentId,
+			Author: input.ParentAuthor,
+			Body: input.ParentBody,
+		}
+	}
 	return &comment, nil
 }
 
@@ -251,7 +253,43 @@ func (router *Router) handleUpsertCommentVote(w http.ResponseWriter, r *http.Req
 	}
 
 	requestLogger := getRequestLogger(r)
-	requestLogger.Info("COMMENT-VOTE-CREATED", "commentId", commentVote.CommentId, "viewer", commentVote.Viewer)
+	requestLogger.Info("COMMENT-VOTE-UPSERTED", "commentId", commentVote.CommentId, "viewer", commentVote.Viewer)
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func (router *Router) handleDeleteCommentVote(w http.ResponseWriter, r *http.Request) {
+	type requestInput struct {
+		CommentId string `validate:"required,notBlank,uuid4" name:"id"`
+	}
+
+	vars := mux.Vars(r)
+	input := requestInput{
+		CommentId: vars["commentId"],
+	}
+
+	//Input validation
+	translator := getTranslator(r)
+	err := validateStruct(router.validate, translator, input)
+	if err != nil {
+		sendToErrorHandlingMiddleware(err, r)
+		return
+	}
+
+	// Make DB query
+	user := getAuthenticatedUser(r)
+	commentVote := postgres.CommentVote{
+		CommentId: input.CommentId,
+		Viewer: user.Username,
+	}
+	err = router.postgresStore.DeleteCommentVote(commentVote)
+	if err != nil {
+		sendToErrorHandlingMiddleware(err, r)
+		return
+	}
+
+	requestLogger := getRequestLogger(r)
+	requestLogger.Info("POST-VOTE-DELETED", "commentId", commentVote.CommentId, "viewer", commentVote.Viewer)
 
 	w.WriteHeader(http.StatusOK)
 }
