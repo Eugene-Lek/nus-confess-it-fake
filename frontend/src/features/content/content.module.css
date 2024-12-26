@@ -1,0 +1,14 @@
+.post-editor {
+    border: solid;
+    border-radius: 5px;
+    border-width: 1px;
+    border-color: #cdced6;   
+}
+
+.body {
+    margin: 0;
+    font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+    font-size: 0.875rem;
+    line-height: 1.43;
+    letter-spacing: 0.01071em;
+}
