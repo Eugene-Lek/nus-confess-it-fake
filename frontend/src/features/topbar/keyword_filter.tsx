@@ -1,25 +1,36 @@
-import { Autocomplete, Box, IconButton, TextField } from "@mui/material";
+import { Autocomplete, Box, FormControl, FormGroup, IconButton, TextField } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import { FC } from "react";
+import { FC,  FormEvent,  useEffect,  useState } from "react";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { queryUpdated } from "./filter_slice";
 
 export const KeywordFilter: FC = () => {
-    // TODO:
-    // On change, update filter state
-    // On click search, make API call
+    const dispatch = useAppDispatch()
+    const initKeywords = useAppSelector((state) => state.filter.query)
+    const [keywords, setKeywords] = useState(initKeywords)
+    useEffect(() => {setKeywords(initKeywords)}, [initKeywords])
 
+    const onSubmit = (e: any) => {
+        e.preventDefault()
+        dispatch(queryUpdated(keywords))
+    }
+
+    const hide = useAppSelector((state) => state.filter.hideQueryFilter)
     return (
-        <Box>
+        <form onSubmit={onSubmit} style={{visibility: hide ? "hidden": "visible"}} >
             <TextField 
-                id="outlined-basic" 
+                value={keywords}
                 label="Search by keyword(s)" 
                 variant="outlined" 
                 size="small" 
                 rows={1}
-                sx={{width: {sm: "150px", md: "200px", lg: "300px"}}}/>
-            <IconButton type="submit" aria-label="search">
+                sx={{width: {sm: "150px", md: "200px", lg: "300px"}}}
+                onChange={(e) => {setKeywords(e.target.value)}}
+                onBlur={onSubmit}/>
+            <IconButton type="submit" aria-label="search" onClick={onSubmit}>
                 <SearchIcon style={{ fill: "#8D99AE" }} />
             </IconButton>
-        </Box>
+        </form>
 
     )
 }
