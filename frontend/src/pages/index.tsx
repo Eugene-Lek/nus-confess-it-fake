@@ -1,8 +1,9 @@
-import { Geist, Geist_Mono } from "next/font/google";
-import { PostCards } from "@/features/content/post_cards";
+import { PostCards } from "@/features/content/posts/post_cards";
+import { useGetPostsQuery } from "@/features/content/posts/api_slice";
+
 
 export default function Home() {
   return (
-    <PostCards/>
+      <PostCards apiQueryHook={useGetPostsQuery}/>
   )
 }
