@@ -1,17 +1,23 @@
 import { MouseEvent, useState } from "react"
-import { Post } from "./post"
+import { Post } from "./posts/post_types"
 import { Box, Typography } from "@mui/material"
 import ThumbUpOffAltIcon from '@mui/icons-material/ThumbUpOffAlt';
 import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
 import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
 import ThumbDownAltIcon from '@mui/icons-material/ThumbDownAlt';
-import { Comment } from "./comment_card";
+import { Comment } from "./comments/comment_types";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { clickedLogin, errorOccured } from "../popups/popup_slice";
+import { useDeletePostVoteMutation, useUpsertPostVoteMutation } from "./posts/api_slice";
+import { useDeleteCommentVoteMutation, useUpsertCommentVoteMutation } from "./comments/api_slice";
+import { userIsLoggedIn } from "../auth/auth";
+import { defaultFetchErrorHandler } from "@/redux/api";
 
+
+const checkIsPost = (value: any): value is Post => !!value?.title;
 
 export const VoteBox = (submission: Post | Comment) => {
-    const checkIsPost = (value: any): value is Post => !!value?.title;
-    const isPost = checkIsPost(submission)
-    const [currentVote, setVote] = useState("")
+    const [currentVote, setVote] = useState(submission.userVote)
 
     // A local version of the post/comment's like and dislike state is created and tracked
     // This way, we don't have to update the redux state of *all* posts/comments whenever
@@ -21,75 +27,95 @@ export const VoteBox = (submission: Post | Comment) => {
     const [likes, setLikes] = useState(submission.likes)
     const [dislikes, setDislikes] = useState(submission.dislikes)
 
-    // TODO
-    const updateBackend = async(vote: "like" | "dislike", action: "create" | "delete") => {
-        const method = action == "create" ? "POST" : "DELETE"
-        /*
-        await fetch(`${isPost ? "posts" : "comments"}/${submission.id}/vote`, {
-            method: method,
-            body: JSON.stringify({
-                vote: vote
-            })
-        })
-        */
-    }
-
+    const authenticated = userIsLoggedIn()
+    const dispatch = useAppDispatch()
 
     const onClickLike = async(event: MouseEvent<SVGSVGElement>) => {
         event.stopPropagation()
 
-        if (currentVote == "like") {
+        // If the user has not logged in, prompt them to do so
+        if (!authenticated) {
+            dispatch(clickedLogin())
+            return
+        }
+
+        if (currentVote == "Like") {
             setVote("")
             setLikes(likes - 1)
-            await updateBackend("like", "delete")
-
-        } else if (currentVote == "dislike"){
-            setVote("like")
+            await updateBackend("Like", "Delete")
+        } else if (currentVote == "Dislike"){
+            setVote("Like")
             setLikes(likes + 1)
             setDislikes(dislikes - 1)
-            await updateBackend("like", "create")
-            await updateBackend("dislike", "delete")
-
+            await updateBackend("Like", "Upsert")
         } else {
-            setVote("like")
+            setVote("Like")
             setLikes(likes + 1)
-            await updateBackend("like", "create")
-
-        }
+            await updateBackend("Like", "Upsert")
+        } 
     }
 
     const onClickDislike = async(event: MouseEvent<SVGSVGElement>) => {
         event.stopPropagation()
+
+        // If the user has not logged in, prompt them to do so
+        if (!authenticated) {
+            dispatch(clickedLogin())
+            return
+        }
         
-        if (currentVote == "dislike") {
+        if (currentVote == "Dislike") {
             setVote("")
             setDislikes(dislikes - 1)
-            await updateBackend("dislike", "delete")
+            await updateBackend("Dislike", "Delete")
 
-        } else if (currentVote == "like"){
-            setVote("dislike")
+        } else if (currentVote == "Like"){
+            setVote("Dislike")
             setDislikes(dislikes + 1)
             setLikes(likes - 1)
-            await updateBackend("dislike", "create")
-            await updateBackend("like", "delete")
+            await updateBackend("Dislike", "Upsert")
 
         } else {
-            setVote("dislike")
+            setVote("Dislike")
             setDislikes(dislikes + 1)
-            await updateBackend("dislike", "create")
+            await updateBackend("Dislike", "Upsert")
         }
+    }
+
+    const [upsertPostVote, {}] = useUpsertPostVoteMutation()
+    const [upsertCommentVote, {}] = useUpsertCommentVoteMutation()
+    const [deletePostVote, {}] = useDeletePostVoteMutation()
+    const [deleteCommentVote, {}] = useDeleteCommentVoteMutation()
+    const updateBackend = async(vote: "Like" | "Dislike", action: "Upsert" | "Delete") => {
+        try {
+            if (checkIsPost(submission)) {
+                if (action == "Upsert") {
+                    await upsertPostVote({postId: submission.id, vote: vote}).unwrap()
+                } else {
+                    await deletePostVote(submission.id).unwrap()
+                }
+            } else {
+                if (action == "Upsert") {
+                    await upsertCommentVote({commentId: submission.id, vote: vote}).unwrap()
+                } else {
+                    await deleteCommentVote(submission.id).unwrap()
+                }
+            }
+        } catch (err: any) {
+            defaultFetchErrorHandler(err, dispatch)
         }
+    }
             
 
     return (
         <Box sx={{display: "flex", flexDirection: "row", gap: "25px"}}>
             <Box sx={{display: "flex", flexDirection: "row", gap: "5px", cursor: 'pointer'}}>
                 <Typography variant="body2">{likes}</Typography>
-                {currentVote == "like" ? <ThumbUpAltIcon id="like" onClick={onClickLike}/> : <ThumbUpOffAltIcon id="like" onClick={onClickLike}/>}
+                {currentVote == "Like" ? <ThumbUpAltIcon id="like" onClick={onClickLike}/> : <ThumbUpOffAltIcon id="like" onClick={onClickLike}/>}
             </Box>
             <Box sx={{display: "flex", flexDirection: "row", gap: "5px", cursor: 'pointer'}}>
                 <Typography variant="body2">{dislikes}</Typography>
-                {currentVote == "dislike" ? <ThumbDownAltIcon id="dislike" onClick={onClickDislike}/> : <ThumbDownOffAltIcon id="dislike" onClick={onClickDislike}/>}
+                {currentVote == "Dislike" ? <ThumbDownAltIcon id="dislike" onClick={onClickDislike}/> : <ThumbDownOffAltIcon id="dislike" onClick={onClickDislike}/>}
             </Box>       
         </Box>
     )
