@@ -1,13 +1,15 @@
 package routes
 
 import (
+	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/casbin/casbin/v2"
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
-	"github.com/gorilla/mux"
 	"github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
 
 	"backend/postgres"
 )
@@ -78,7 +80,7 @@ func NewRouter(postgres *postgres.PostgresStore, universalTranslator *ut.Univers
 	// Accept requests that come from the frontend domain
 	headers := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
 	methods := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"})
-	origins := handlers.AllowedOrigins([]string{"http://localhost:3000"})
+	origins := handlers.AllowedOrigins([]string{fmt.Sprintf("%v://%v:%v", os.Getenv("FRONTEND_PROTOCOL"), os.Getenv("FRONTEND_HOST"), os.Getenv("FRONTEND_PORT"))})
 	creds := handlers.AllowCredentials()
 
 	return handlers.CORS(headers, methods, origins, creds)(router)
