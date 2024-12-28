@@ -39,7 +39,7 @@ export const PostCards: FC<props> = ({apiQueryHook, extraProps}) => {
 
     return (
         <Box sx={{px:"40px", paddingTop: "25px", paddingBottom:"200px", display: "flex", flexDirection:"column", gap: "30px"}}>
-            <Box sx={{display: "flex"}}>
+            <Box sx={{display: "flex", gap: "25px"}}>
                 <SortBySelect/>
                 {isLoading
                     ? <CircularProgress size="35px"/>  
