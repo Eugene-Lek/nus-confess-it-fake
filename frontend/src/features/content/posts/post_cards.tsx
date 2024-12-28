@@ -1,4 +1,4 @@
-import { Box, CircularProgress } from "@mui/material"
+import { Box, CircularProgress, Typography } from "@mui/material"
 import { Post } from "./post_types"
 import { PostCard } from "./post_card"
 import { FC, useEffect } from "react"
@@ -38,16 +38,23 @@ export const PostCards: FC<props> = ({apiQueryHook, extraProps}) => {
     defaultFetchErrorHandler(error, dispatch)
 
     return (
-        <>
-            <SortBySelect/>
-            {isLoading
-                ? <CircularProgress sx={{marginTop: "25px"}} size="35px"/>  
-                : <></>
-            }
-            <Box sx={{display: "flex", flexDirection: "column", gap: "30px", px:"40px", paddingTop: "30px", paddingBottom:"200px"}}>
-                    {posts?.map((post) => <PostCard key={post.id} {...post}></PostCard>)}
+        <Box sx={{px:"40px", paddingTop: "25px", paddingBottom:"200px", display: "flex", flexDirection:"column", gap: "30px"}}>
+            <Box sx={{display: "flex"}}>
+                <SortBySelect/>
+                {isLoading
+                    ? <CircularProgress size="35px"/>  
+                    : <></>
+                }
             </Box>
-        </>
+            {!posts
+                ? <></>
+                : posts.length == 0
+                ? <Typography variant="body1">No posts match the selected filters</Typography>
+                : <Box sx={{display: "flex", flexDirection: "column", gap: "30px"}}>
+                        {posts?.map((post) => <PostCard key={post.id} {...post}></PostCard>)}
+                  </Box>
+            }
+        </Box>
     )
 
 }

@@ -1,4 +1,4 @@
-import { Box, CircularProgress, SxProps, Theme } from "@mui/material"
+import { Box, CircularProgress, SxProps, Theme, Typography } from "@mui/material"
 import { Comment } from "./comment_types"
 import { CommentCardUnderPost, CommentCardInListing } from "./comment_card"
 import { Dispatch, FC, SetStateAction, useEffect } from "react"
@@ -68,15 +68,22 @@ export const CommentCardsInListing: FC<props2> = ({apiQueryHook, extraProps}) =>
     defaultFetchErrorHandler(error, dispatch)
 
     return (
-        <>
-            <SortBySelect/>
-            {isLoading
-                ? <CircularProgress sx={{marginTop: "25px"}} size="35px"/>  
-                : <></>
-            }
-            <Box sx={{display: "flex", flexDirection: "column", gap: "15px", px:"40px", paddingTop: "30px", paddingBottom:"200px"}}>
-                {comments?.map((comment) => <CommentCardInListing key={comment.id} {...comment}></CommentCardInListing>)}
+        <Box sx={{px:"40px", paddingTop: "25px", paddingBottom:"200px", display: "flex", flexDirection:"column", gap: "30px"}}>
+            <Box sx={{display: "flex"}}>
+                <SortBySelect/>
+                {isLoading
+                    ? <CircularProgress size="35px"/>  
+                    : <></>
+                }
             </Box>
-        </>
+            {!comments
+                ? <></>
+                : comments.length == 0
+                ? <Typography variant="body1">No comments match the selected filters</Typography>
+                : <Box sx={{display: "flex", flexDirection: "column", gap: "15px"}}>
+                    {comments?.map((comment) => <CommentCardInListing key={comment.id} {...comment}></CommentCardInListing>)}
+                  </Box>
+            }
+        </Box>        
     )
 }
