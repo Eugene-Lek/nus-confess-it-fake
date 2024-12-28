@@ -11,12 +11,16 @@ import { FC, useEffect, useRef } from "react"
 // Yup provides an easy way to define input validation checks
 export const postEditorSchema = Yup.object({
     title: Yup.string()
-        .default("")
         .required("Required"),
     body: Yup.string()
-        .default("")
-        .required("Required"),
-    tags: Yup.array(Yup.string())
+        .required("Required")
+        .max(10000, "Maximum of 10000 characters"),
+    tags: Yup.array()
+              .of(
+                Yup.string()
+                  .max(30, "Maximum of 30 characters per tag")
+              )
+              .max(5, "Maximum of 5 tags")              
 })
 
 export const PostEditor: FC<{formState: FormikProps<any>}> = ({formState}) => {
