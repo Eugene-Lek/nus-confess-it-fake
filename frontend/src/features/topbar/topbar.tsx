@@ -11,6 +11,7 @@ import { TagFilter } from './tag_filter';
 import { useAppSelector } from '@/redux/hooks';
 import { LogoutButton } from './logout_button';
 import { userIsLoggedIn } from '../auth/auth';
+import { LoginSignUpButtons } from './login_signup_buttons';
 
 
 export const Topbar: FC<PropsWithChildren> = () => {
@@ -20,17 +21,20 @@ export const Topbar: FC<PropsWithChildren> = () => {
         <>
             <AppBar position='fixed' sx={{borderColor: "#AEAEAE", backgroundColor: "white", zIndex: (theme) => theme.zIndex.drawer + 1}}>
                 <Toolbar sx={{display: 'flex', justifyContent: 'space-between'}}>
-                    <Typography variant='h5' color="space">NUSConfessITFake</Typography>
+                    <Typography 
+                        variant='h5' 
+                        color="space"
+                        sx={{display: {xs: "none", sm: "none", md: "block", lg: "block"}}}
+                    >
+                        NUSConfessITFake
+                    </Typography>
                     <Box sx={{ display: 'flex', gap: "20px", alignItems: "center"}}>
                         <KeywordFilter/>
                         <TagFilter/>
                     </Box>
                     { authenticated 
                         ? <LogoutButton/>
-                        : <Box sx={{ display: 'flex', gap: "20px"}}>
-                            <LoginButton/>
-                            <SignUpButton/>
-                          </Box>
+                        : <LoginSignUpButtons/>
                     }
                 </Toolbar>
             </AppBar>
