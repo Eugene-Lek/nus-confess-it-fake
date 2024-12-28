@@ -113,7 +113,8 @@ export const CommentEditor = () => {
                     value={draft} 
                     onChange={(e) => {setDraft(e.target.value)}} 
                     onClick={onClick}
-                    disabled={isCreatingComment || isUpdatingComment}/>
+                    disabled={isCreatingComment || isUpdatingComment}
+                    maxLength={10000}/>
             </Box>
             { !authenticated
                 ? <></>
