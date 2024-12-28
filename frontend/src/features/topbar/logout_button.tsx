@@ -5,6 +5,8 @@ import { LoadingButton } from "@mui/lab";
 import { errorOccured } from "../popups/popup_slice";
 import { useLogoutMutation } from "../popups/api_slice";
 import { useRouter } from "next/router";
+import { OnClickMenu } from "../content/onclick_menu";
+import { Box } from "@mui/material";
 
 export const LogoutButton: FC = () => {
     const dispatch = useAppDispatch()
@@ -25,7 +27,21 @@ export const LogoutButton: FC = () => {
         }
     }
 
+    // If the screen is small or medium, show a menu that pops up upon clicking it with a logout option
+    // Otherwise, show a logout button
     return (
-        <LoadingButton variant="contained" onClick={handleLogout} loading={isLoading} color="khaki">Logout</LoadingButton>
+        <>
+            <Box sx={{display: {xs: "block", sm: "block", md: "block", lg: "none"}}}>
+                <OnClickMenu options={[{label: "Logout", onClick: handleLogout}]}/>
+            </Box>
+            <LoadingButton 
+                variant="contained" 
+                onClick={handleLogout} 
+                loading={isLoading} 
+                color="khaki"
+                sx={{display: {xs: "none", sm: "none", md: "none", lg: "block"}}}
+            >Logout
+            </LoadingButton>        
+        </>        
     )
 }

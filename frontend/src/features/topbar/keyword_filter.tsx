@@ -24,7 +24,7 @@ export const KeywordFilter: FC = () => {
                 variant="outlined" 
                 size="small" 
                 rows={1}
-                sx={{width: {sm: "150px", md: "200px", lg: "300px"}}}
+                sx={{width: {xs: "175px", sm: "225px", md: "250px", lg: "300px"}}}
                 onChange={(e) => {setKeywords(e.target.value)}}
                 onBlur={onSubmit}/>
             <IconButton type="submit" aria-label="search" onClick={onSubmit}>
