@@ -99,7 +99,7 @@ func (postgres *PostgresStore) GetComments(username string, postId string, autho
 		conditionCount += 1
 	}
 	if likedBy != "" {
-		query = query + fmt.Sprintf(" AND comment_vote.viewer = $%v", conditionCount)
+		query = query + fmt.Sprintf(" AND comment_vote.viewer = $%v AND comment_vote.vote = 'Like'", conditionCount)
 		conditions = append(conditions, likedBy)
 		conditionCount += 1
 	}
@@ -111,7 +111,7 @@ func (postgres *PostgresStore) GetComments(username string, postId string, autho
 	case "Oldest":
 		query = query + " ORDER BY c.created_at ASC"
 	case "Popular":
-		query = query + " ORDER BY c_votes.likes DESC"
+		query = query + " ORDER BY c_votes.likes - c_votes.dislikes DESC"
 	case "Relevance":
 		// If search query is empty, sort by tag relevance
 		// If tags are empty, sort by newest first
