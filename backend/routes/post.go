@@ -152,8 +152,8 @@ func (router *Router) getPostParams(r *http.Request) (*postgres.Post, error) {
 	type requestInput struct {
 		Id string `validate:"required,notBlank,uuid4" name:"id"`
 		Title string `validate:"required,notBlank" name:"title"`
-		Body string `validate:"required,notBlank" name:"body"`
-		Tags []string // Tags are optional
+		Body string `validate:"required,notBlank,max=10000" name:"body"`
+		Tags []string `validate:"omitempty,max=5,dive,max=30" name:"tags"`// Tags are optional
 		Status string `validate:"required,oneof=Draft Published Deleted" name:"status"`
 	}
 
