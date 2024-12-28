@@ -133,7 +133,7 @@ func (postgres *PostgresStore) GetPosts(username string, author string, statuses
 							array_remove(array_agg(DISTINCT lower(post_tag.tag)), NULL) AS tags_lowercased, 
 							COUNT(case when post_vote.vote = 'Like' then 1 else null end) AS likes,
 					  		COUNT(case when post_vote.vote = 'Dislike' then 1 else null end) AS dislikes,
-							array_agg(post_vote.viewer) AS likers
+							array_agg(post_vote.viewer) filter (WHERE post_vote.vote = 'Like') AS likers
 			   		FROM post
 			   		LEFT JOIN post_tag ON post.id = post_tag.post_id
 					LEFT JOIN post_vote ON post.id= post_vote.post_id				
@@ -202,7 +202,6 @@ func (postgres *PostgresStore) GetPosts(username string, author string, statuses
 	default:
 		query = query + " ORDER BY post.created_at DESC"
 	}
-	fmt.Print(query)
 
 	// Execute the query
 	rows, err := postgres.db.Query(query, conditions...)
