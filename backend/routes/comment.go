@@ -88,7 +88,7 @@ func (router *Router) handleGetLikedComments(w http.ResponseWriter, r *http.Requ
 func (router *Router) getCommentParams(r *http.Request) (*postgres.Comment, error) {
 	type requestInput struct {
 		Id string `validate:"required,notBlank,uuid4" name:"id"`
-		Body string `validate:"required,notBlank" name:"body"`
+		Body string `validate:"required,notBlank,max=10000" name:"body"`
 		PostId string `validate:"required,notBlank,uuid4" name:"post id"`
 		ParentId string `validate:"omitempty,notBlank,uuid4" name:"parent id"`
 		ParentAuthor string `validate:"omitempty,notBlank" name:"parent author"`
