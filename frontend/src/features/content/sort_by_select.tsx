@@ -7,7 +7,7 @@ export const SortBySelect = () => {
     const dispatch = useAppDispatch()
 
     return (
-        <FormControl sx={{marginTop: "25px", mx: "40px"}}>
+        <FormControl>
             <InputLabel id="sortBy">Sort By</InputLabel>
             <Select
                 labelId="sortBy"
