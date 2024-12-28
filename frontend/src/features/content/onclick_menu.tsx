@@ -55,7 +55,8 @@ export const OnClickMenu: FC<props> = ({options}) => {
                 aria-controls={open ? 'menu' : undefined}
                 aria-expanded={open ? 'true' : undefined}
                 aria-haspopup="true"
-                onClick={handleToggle}            
+                onClick={handleToggle}  
+                sx={{color: "black"}} // Overwrite the color prop defined by its parent, if any          
             />
             <Popper
             open={open}
