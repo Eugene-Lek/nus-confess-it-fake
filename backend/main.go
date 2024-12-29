@@ -6,11 +6,12 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 
 	pgadapter "github.com/casbin/casbin-pg-adapter"
 	"github.com/casbin/casbin/v2"
+	"github.com/casbin/casbin/v2/model"
 	"github.com/go-pg/pg/v10"
-	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -18,28 +19,32 @@ func main() {
 	logOutputMedium := os.Stdout
 	rootLogger := routes.NewRootLogger(logOutputMedium)
 
-	// Load environment variables
-	err := godotenv.Load()
-	if err != nil {
-		rootLogger.Fatal("LOADING-ENV-VARS-FAILED", "errorMessage", fmt.Sprintf("Error loading .env file : %s", err))
-	}	
 	routes.AuthSecretKey = []byte(os.Getenv("AUTH_SECRET_KEY"))
-	backendHost := os.Getenv("BACKEND_HOST")
 	backendPort := os.Getenv("BACKEND_PORT")
 	DbHost := os.Getenv("DB_HOST")
 	DbPort := os.Getenv("DB_PORT")
 	DbUserPassword := os.Getenv("DB_USER_PASSWORD")
 
-	listenAddress := fmt.Sprintf("%v:%v", backendHost, backendPort)
+	listenAddress := fmt.Sprintf("0.0.0.0:%v", backendPort) /// 0.0.0.0 is used to faciliate binding to any ip address
 	dbConnString := fmt.Sprintf("host=%v port=%v user=backend password=%v dbname=backend sslmode=disable", DbHost, DbPort, DbUserPassword)
 
-	postgres, err := postgres.NewPostgresStore(dbConnString)
-	if err != nil {
-		rootLogger.Fatal("DB-CONNECTION-FAILED", "errorMessage", fmt.Sprintf("Could not connect to database: %s", err))
-	} else {
-		opts, _ := pg.ParseURL(fmt.Sprintf("postgres://backend:%v@%v:%v/backend?sslmode=disable", DbUserPassword, DbHost, DbPort))
-		rootLogger.Info("DB-CONNECTION-ESTABLISHED", "user", opts.User, "host", opts.Addr, "database", opts.Database)
+	postgresStore, err := postgres.NewPostgresStore(dbConnString)
+	opts, _ := pg.ParseURL(fmt.Sprintf("postgres://backend:%v@%v:%v/backend?sslmode=disable", DbUserPassword, DbHost, DbPort))
+	retry := 0
+	for err != nil {
+		retry += 1
+		if (retry > 30) {
+			// wait up to 30 seconds for the db to be set up
+			rootLogger.Fatal("DB-CONNECTION-FAILED", "errorMessage", fmt.Sprintf("Could not connect to database: %s", err))
+		}
+		
+		rootLogger.Info("WAITING-FOR-DB-SETUP", "user", opts.User, "host", opts.Addr, "database", opts.Database)
+		time.Sleep(time.Second)
+
+		postgresStore, err = postgres.NewPostgresStore(dbConnString)		
 	}
+	rootLogger.Info("DB-CONNECTION-ESTABLISHED", "user", opts.User, "host", opts.Addr, "database", opts.Database)
+
 
 	// A Translator maps tags to text templates (you must register these tags & templates yourself)
 	// In the case of cardinals & ordinals, numerical parameters are also taken into account
@@ -55,7 +60,6 @@ func main() {
 		rootLogger.Info("VALIDATOR-INSTANTIATED")
 	}
 
-	opts, _ := pg.ParseURL("postgres://backend:abcd1234@localhost:5433/backend?sslmode=disable")
 	db := pg.Connect(opts)
 	defer db.Close()
 
@@ -66,7 +70,8 @@ func main() {
 		rootLogger.Info("AUTHORIZATION-ADAPTER-INSTANTIATED", "user", opts.User, "host", opts.Addr, "database", opts.Database)
 	}
 
-	authEnforcer, err := casbin.NewEnforcer("auth_model.conf", a)
+	m, _ := model.NewModelFromString(routes.AuthModel)
+	authEnforcer, err := casbin.NewEnforcer(m, a)
 	if err != nil {
 		rootLogger.Fatal("AUTHORIZATION-ENFORCER-INSTANTIATION-FAILED", "errorMessage", fmt.Sprintf("Could not instantiate Authorization Enforcer: %s", err))
 	} else {
@@ -79,7 +84,7 @@ func main() {
 		rootLogger.Info("AUTHORIZATION-POLICY-LOADED")
 	}
 
-	router := routes.NewRouter(postgres, universalTranslator, validate, rootLogger, authEnforcer)
+	router := routes.NewRouter(postgresStore, universalTranslator, validate, rootLogger, authEnforcer)
 
 	rootLogger.Info("STARTING-UP")
 	rootLogger.Info("SERVER-STARTED", "address", listenAddress)
