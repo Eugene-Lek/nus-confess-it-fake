@@ -1,5 +1,5 @@
 -- Create a new user and use it to access the database instead of the default postgres user
--- This way, we can restrict its privileges to only the necessary ones
+-- This way, its privileges can be restricted to only the necessary ones
 CREATE USER backend WITH PASSWORD 'abcd1234';
 
 -- Revoke all Schema-level & Table-level permissions from the Public role (default role assigned to all users)
