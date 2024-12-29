@@ -1,12 +1,14 @@
-import { Autocomplete, Box, Button, Chip, DialogContentText, TextField, Typography } from "@mui/material"
-import { MDXEditor, UndoRedo, BoldItalicUnderlineToggles, toolbarPlugin, listsPlugin, ListsToggle, setMarkdown$, MDXEditorMethods } from '@mdxeditor/editor'
+/* eslint-disable react/jsx-key */
+
+import { hasError } from "@/validation/helpers"
+import Yup from "@/validation/yup"
+import { BoldItalicUnderlineToggles, listsPlugin, ListsToggle, MDXEditor, MDXEditorMethods, toolbarPlugin, UndoRedo } from '@mdxeditor/editor'
 import '@mdxeditor/editor/style.css'
+import { Autocomplete, Box, Chip, DialogContentText, TextField } from "@mui/material"
+import { FormikProps } from "formik"
+import { FC, useEffect, useRef } from "react"
 import styles from "../content.module.css"
 import { useGetTagsQuery } from "./api_slice"
-import { FormikProps } from "formik"
-import Yup from "@/validation/yup"
-import { hasError } from "@/validation/helpers"
-import { FC, useEffect, useRef } from "react"
 
 // Yup provides an easy way to define input validation checks
 export const postEditorSchema = Yup.object({
@@ -24,7 +26,7 @@ export const postEditorSchema = Yup.object({
 })
 
 export const PostEditor: FC<{formState: FormikProps<any>}> = ({formState}) => {
-    const {data: tagSuggestions, isFetching} = useGetTagsQuery()
+    const {data: tagSuggestions} = useGetTagsQuery()
     const mdxEditorRef = useRef<MDXEditorMethods>(null)
 
     useEffect(() => {
@@ -49,10 +51,10 @@ export const PostEditor: FC<{formState: FormikProps<any>}> = ({formState}) => {
                 multiple
                 options={tagSuggestions || Array(0)}
                 value={formState.values["tags"]}
-                onChange={(event, newValue) => {
+                onChange={(_, newValue) => {
                     formState.setFieldValue("tags", newValue)
                 }}
-                onBlur={(e) => { 
+                onBlur={() => { 
                   formState.setFieldTouched("tags", true) 
                 }}
                 autoSelect                
