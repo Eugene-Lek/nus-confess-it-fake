@@ -28,6 +28,7 @@ func main() {
 	listenAddress := fmt.Sprintf("0.0.0.0:%v", backendPort) /// 0.0.0.0 is used to faciliate binding to any ip address
 	dbConnString := fmt.Sprintf("host=%v port=%v user=backend password=%v dbname=backend sslmode=disable", DbHost, DbPort, DbUserPassword)
 
+	// Connect to the database
 	postgresStore, err := postgres.NewPostgresStore(dbConnString)
 	opts, _ := pg.ParseURL(fmt.Sprintf("postgres://backend:%v@%v:%v/backend?sslmode=disable", DbUserPassword, DbHost, DbPort))
 	retry := 0
@@ -60,6 +61,7 @@ func main() {
 		rootLogger.Info("VALIDATOR-INSTANTIATED")
 	}
 
+	// Load the auth policies
 	db := pg.Connect(opts)
 	defer db.Close()
 
