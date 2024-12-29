@@ -4,7 +4,7 @@ FROM golang:1.23-alpine AS build
 WORKDIR /app
 
 # Copy the Go application source code into the container
-COPY ./backend .
+COPY . .
 
 # Build the Go application
 RUN go build -o backend .
