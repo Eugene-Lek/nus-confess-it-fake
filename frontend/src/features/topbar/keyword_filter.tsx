@@ -1,7 +1,7 @@
-import { Autocomplete, Box, FormControl, FormGroup, IconButton, TextField } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
-import { FC,  FormEvent,  useEffect,  useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import SearchIcon from "@mui/icons-material/Search";
+import { IconButton, TextField } from "@mui/material";
+import { FC, useEffect, useState } from "react";
 import { queryUpdated } from "./filter_slice";
 
 export const KeywordFilter: FC = () => {

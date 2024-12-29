@@ -1,17 +1,14 @@
-import { FC, PropsWithChildren } from 'react'
+import { FC, PropsWithChildren } from 'react';
 
+import { Box } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import { Box, Button } from '@mui/material';
-import { LoginButton } from './login_button';
-import { SignUpButton } from './signup_button';
-import { KeywordFilter } from './keyword_filter';
-import { TagFilter } from './tag_filter';
-import { useAppSelector } from '@/redux/hooks';
-import { LogoutButton } from './logout_button';
 import { userIsLoggedIn } from '../auth/auth';
+import { KeywordFilter } from './keyword_filter';
 import { LoginSignUpButtons } from './login_signup_buttons';
+import { LogoutButton } from './logout_button';
+import { TagFilter } from './tag_filter';
 
 
 export const Topbar: FC<PropsWithChildren> = () => {

@@ -1,19 +1,19 @@
-import { Box, Typography } from "@mui/material"
-import { VoteBox } from "../vote_box"
-import ReplyIcon from '@mui/icons-material/Reply';
-import { ParentCommentCard } from "./parent_comment";
-import { Dispatch, FC, SetStateAction, useContext } from "react";
-import { formatDate } from "../utils";
-import { MarkdownBody } from "../custom_components";
-import { useRouter } from "next/router";
-import { PostContext, scrollToParamName } from "../posts/post";
-import { menuOption, OnClickMenu } from "../onclick_menu";
+import { getUser } from "@/features/auth/auth";
 import { PopUpContext } from "@/features/popups/popup_context";
-import { useDispatch } from "react-redux";
 import { clickedDelete } from "@/features/popups/popup_slice";
+import ReplyIcon from '@mui/icons-material/Reply';
+import { Box, Typography } from "@mui/material";
+import { useRouter } from "next/router";
+import { FC, useContext } from "react";
+import { useDispatch } from "react-redux";
+import { MarkdownBody } from "../custom_components";
+import { menuOption, OnClickMenu } from "../onclick_menu";
+import { PostContext, scrollToParamName } from "../posts/post";
+import { formatDate } from "../utils";
+import { VoteBox } from "../vote_box";
 import { useDeleteCommentMutation } from "./api_slice";
 import { Comment } from "./comment_types";
-import { getUser } from "@/features/auth/auth";
+import { ParentCommentCard } from "./parent_comment";
 
 interface coreProps {
     comment: Comment

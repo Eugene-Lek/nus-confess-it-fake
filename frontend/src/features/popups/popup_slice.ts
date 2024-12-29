@@ -1,7 +1,4 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { TypedMutationTrigger, TypedUseMutation } from '@reduxjs/toolkit/query/react'
-import { useDeleteCommentMutation } from '../content/comments/api_slice'
-import { deleteConfimationProps } from './delete_confirmation'
 
 interface PopupState {
     type: "error" | "login" | "signup" | "delete confirmation" | undefined

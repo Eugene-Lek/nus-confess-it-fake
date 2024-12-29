@@ -1,15 +1,15 @@
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { Button, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@mui/material";
-import { FC, useState } from "react";
-import { closed } from "./popup_slice";
-import Yup from "@/validation/yup";
-import { FormikProps, useFormik } from "formik";
+import { useAppDispatch } from "@/redux/hooks";
 import { hasError } from "@/validation/helpers";
+import Yup from "@/validation/yup";
 import { LoadingButton } from "@mui/lab";
+import { DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@mui/material";
+import { FormikProps, useFormik } from "formik";
+import { useRouter } from "next/router";
+import { FC, useState } from "react";
 import { loggedIn } from "../auth/auth";
 import { useCreateUserMutation } from "./api_slice";
-import { useRouter } from "next/router";
 import { PasswordField } from "./password_field";
+import { closed } from "./popup_slice";
 
 export const SignUp: FC = () => {
     const dispatch = useAppDispatch()
@@ -43,7 +43,7 @@ export const SignUp: FC = () => {
     // It tracks the user's inputs and keeps track of validation errors, if any
     const formState: FormikProps<any> = useFormik({
         validationSchema: schema,
-        onSubmit: (input) => undefined, // This is set to a dummy function as it will not be used
+        onSubmit: () => undefined, // This is set to a dummy function as it will not be used
         initialValues: {username: "", password: "", confirmPassword: ""}
     })
 

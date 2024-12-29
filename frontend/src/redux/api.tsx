@@ -1,6 +1,6 @@
-import { config } from '../../env'
 import { errorOccured } from '@/features/popups/popup_slice'
-import { createApi, fetchBaseQuery, FetchBaseQueryError } from '@reduxjs/toolkit/query/react'
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { config } from '../../env'
 import { AppDispatch } from './store'
 
 export const baseApiSlice = createApi({

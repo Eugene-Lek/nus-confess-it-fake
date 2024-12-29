@@ -1,12 +1,12 @@
 import { useAppDispatch } from "@/redux/hooks";
-import { FC, useState } from "react";
-import { loggedOut } from "../auth/auth";
 import { LoadingButton } from "@mui/lab";
-import { errorOccured } from "../popups/popup_slice";
-import { useLogoutMutation } from "../popups/api_slice";
-import { useRouter } from "next/router";
-import { OnClickMenu } from "../content/onclick_menu";
 import { Box } from "@mui/material";
+import { useRouter } from "next/router";
+import { FC } from "react";
+import { loggedOut } from "../auth/auth";
+import { OnClickMenu } from "../content/onclick_menu";
+import { useLogoutMutation } from "../popups/api_slice";
+import { errorOccured } from "../popups/popup_slice";
 
 export const LogoutButton: FC = () => {
     const dispatch = useAppDispatch()

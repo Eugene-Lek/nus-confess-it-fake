@@ -1,14 +1,14 @@
-import { Box, CircularProgress, SxProps, Theme, Typography } from "@mui/material"
-import { Comment } from "./comment_types"
-import { CommentCardUnderPost, CommentCardInListing } from "./comment_card"
-import { Dispatch, FC, SetStateAction, useEffect } from "react"
-import { SortBySelect } from "../sort_by_select"
-import { useAppDispatch, useAppSelector } from "@/redux/hooks"
-import { filterCleared, hideTagFilter, showTagFilter } from "@/features/topbar/filter_slice"
 import { userIsLoggedIn } from "@/features/auth/auth"
 import { clickedLogin } from "@/features/popups/popup_slice"
+import { filterCleared, hideTagFilter, showTagFilter } from "@/features/topbar/filter_slice"
 import { defaultFetchErrorHandler } from "@/redux/api"
+import { useAppDispatch, useAppSelector } from "@/redux/hooks"
+import { Box, CircularProgress, Typography } from "@mui/material"
 import { TypedUseQuery } from "@reduxjs/toolkit/query/react"
+import { FC, useEffect } from "react"
+import { SortBySelect } from "../sort_by_select"
+import { CommentCardInListing, CommentCardUnderPost } from "./comment_card"
+import { Comment } from "./comment_types"
 
 interface props1 {
     comments: Comment[]
@@ -38,6 +38,8 @@ interface props2 {
 
 export const CommentCardsInListing: FC<props2> = ({apiQueryHook, extraProps}) => {
     const dispatch = useAppDispatch()
+    const query = useAppSelector(state => state.filter.query)
+    const sortBy = useAppSelector(state => state.filter.sortBy)
 
     // When the user navigates to another page (i.e. when the component dismounts),
     // clear the filters and show the tag filter again
@@ -46,7 +48,7 @@ export const CommentCardsInListing: FC<props2> = ({apiQueryHook, extraProps}) =>
             dispatch(filterCleared())
             dispatch(showTagFilter())
         }
-    }, [])
+    })
 
     // Hide the tag filter in the top bar since it is irrelevant
     dispatch(hideTagFilter())
@@ -60,11 +62,11 @@ export const CommentCardsInListing: FC<props2> = ({apiQueryHook, extraProps}) =>
 
     // Fetch the posts
     const getCommentsProps = {
-        query: useAppSelector(state => state.filter.query),
-        sortBy: useAppSelector(state => state.filter.sortBy),
+        query: query,
+        sortBy: sortBy,
         ...extraProps
     }
-    var {data: comments, isLoading, error} = apiQueryHook(getCommentsProps)
+    const {data: comments, isLoading, error} = apiQueryHook(getCommentsProps)
     defaultFetchErrorHandler(error, dispatch)
 
     return (

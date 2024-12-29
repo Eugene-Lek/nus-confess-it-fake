@@ -1,13 +1,10 @@
-import { useAppDispatch } from "@/redux/hooks";
-import { DialogActions, DialogContent, DialogContentText, DialogTitle, Link, TextField } from "@mui/material";
-import { FC, useState } from "react";
-import { clickedSignup, closed } from "./popup_slice";
-import { loggedIn } from "../auth/auth";
-import { LoadingButton } from "@mui/lab";
-import { useLoginMutation } from "./api_slice";
-import { useRouter } from "next/router";
-import { TypedMutationTrigger } from "@reduxjs/toolkit/query/react";
 import { defaultFetchErrorHandler } from "@/redux/api";
+import { useAppDispatch } from "@/redux/hooks";
+import { LoadingButton } from "@mui/lab";
+import { DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
+import { TypedMutationTrigger } from "@reduxjs/toolkit/query/react";
+import { FC } from "react";
+import { closed } from "./popup_slice";
 
 export interface deleteConfimationProps {
     deleteQueryFunc: TypedMutationTrigger<any, any, any> | null
@@ -16,13 +13,14 @@ export interface deleteConfimationProps {
 }
 
 export const DeleteConfirmation: FC<deleteConfimationProps> = ({deleteQueryFunc, resourceId, isDeleting}) => {
+    const dispatch = useAppDispatch()
+        
     if (!deleteQueryFunc) {
         console.log("reached")
         // If the delete function has not been set due to a programming error, end rendering of the component
         return
     }
 
-    const dispatch = useAppDispatch()
     const handleClose = () => dispatch(closed())
 
     const handleDelete = async() => {      
