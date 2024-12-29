@@ -25,17 +25,11 @@ export default function CreatePost() {
         }
     }, [])      
 
-    const authenticated = userIsLoggedIn()
-    if (!authenticated) {
-        dispatch(clickedLogin())
-        return <></>
-    }
-
     // useFormik hook is like useState, but for forms.
     // It tracks the user's inputs and keeps track of validation errors, if any
     const formState: FormikProps<any> = useFormik({
         validationSchema: postEditorSchema,
-        onSubmit: (input) => {},
+        onSubmit: () => {},
         initialValues: {title: "", body: "", tags: Array(0)}
     })
 
@@ -70,6 +64,12 @@ export default function CreatePost() {
           defaultFetchErrorHandler(err, dispatch)
       }
     }
+
+    const authenticated = userIsLoggedIn()
+    if (!authenticated) {
+        dispatch(clickedLogin())
+        return <></>
+    }    
 
     return (
         <Box sx={{display: "flex", flexDirection: "column", gap: "15px", px:"40px", paddingTop: "30px", paddingBottom:"200px"}}>
