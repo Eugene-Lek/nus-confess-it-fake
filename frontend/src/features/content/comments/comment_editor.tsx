@@ -25,7 +25,7 @@ export const CommentEditor = () => {
 
     // useState only uses the init value for the 1st render, 
     // so useEffect is used to update draft whenever the comment to edit changes
-    useEffect(() => { setDraft(init)}, [commentToEdit] )
+    useEffect(() => { setDraft(init)}, [init] )
 
     // Prevent the user from drafting a comment unless they have logged in
     const authenticated = userIsLoggedIn()
