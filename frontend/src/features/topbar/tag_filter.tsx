@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { Autocomplete, Box, TextField } from "@mui/material";
 import { FC } from "react";
 import { useGetTagsQuery } from "../content/posts/api_slice";
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { tagsUpdated } from "./filter_slice";
 
 export const TagFilter: FC = () => {

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import { TextareaAutosize as BaseTextareaAutosize } from '@mui/base/TextareaAutosize';
 import Markdown from 'react-markdown'
 import { styled } from '@mui/system';

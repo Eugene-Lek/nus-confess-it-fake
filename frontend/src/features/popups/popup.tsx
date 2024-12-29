@@ -1,12 +1,12 @@
-import { Dialog, PaperProps} from "@mui/material";
-import { ElementType, FC, JSX, useContext } from "react";
-import { useAppSelector, useAppDispatch } from "@/redux/hooks";
-import { closed } from "./popup_slice";
-import { Login } from "./login";
-import { SignUp } from "./signup";
-import { Error } from "./error";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { Dialog } from "@mui/material";
+import { FC, useContext } from "react";
 import { DeleteConfirmation } from "./delete_confirmation";
+import { Error } from "./error";
+import { Login } from "./login";
 import { PopUpContext } from "./popup_context";
+import { closed } from "./popup_slice";
+import { SignUp } from "./signup";
 
 
 // This component is meant to be a singleton to ensure that at most 1 popup can exist at all times

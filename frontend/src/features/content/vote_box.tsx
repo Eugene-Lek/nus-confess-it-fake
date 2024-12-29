@@ -1,17 +1,17 @@
-import { MouseEvent, useState } from "react"
-import { Post } from "./posts/post_types"
-import { Box, Typography } from "@mui/material"
-import ThumbUpOffAltIcon from '@mui/icons-material/ThumbUpOffAlt';
-import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
-import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
-import ThumbDownAltIcon from '@mui/icons-material/ThumbDownAlt';
-import { Comment } from "./comments/comment_types";
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { clickedLogin, errorOccured } from "../popups/popup_slice";
-import { useDeletePostVoteMutation, useUpsertPostVoteMutation } from "./posts/api_slice";
-import { useDeleteCommentVoteMutation, useUpsertCommentVoteMutation } from "./comments/api_slice";
-import { userIsLoggedIn } from "../auth/auth";
 import { defaultFetchErrorHandler } from "@/redux/api";
+import { useAppDispatch } from "@/redux/hooks";
+import ThumbDownAltIcon from '@mui/icons-material/ThumbDownAlt';
+import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
+import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
+import ThumbUpOffAltIcon from '@mui/icons-material/ThumbUpOffAlt';
+import { Box, Typography } from "@mui/material";
+import { MouseEvent, useState } from "react";
+import { userIsLoggedIn } from "../auth/auth";
+import { clickedLogin } from "../popups/popup_slice";
+import { useDeleteCommentVoteMutation, useUpsertCommentVoteMutation } from "./comments/api_slice";
+import { Comment } from "./comments/comment_types";
+import { useDeletePostVoteMutation, useUpsertPostVoteMutation } from "./posts/api_slice";
+import { Post } from "./posts/post_types";
 
 
 const checkIsPost = (value: any): value is Post => !!value?.title;

@@ -1,14 +1,12 @@
+import { filterCleared } from "@/features/topbar/filter_slice"
+import { defaultFetchErrorHandler } from "@/redux/api"
+import { useAppDispatch, useAppSelector } from "@/redux/hooks"
 import { Box, CircularProgress, Typography } from "@mui/material"
-import { Post } from "./post_types"
-import { PostCard } from "./post_card"
+import { TypedUseQuery } from "@reduxjs/toolkit/query/react"
 import { FC, useEffect } from "react"
 import { SortBySelect } from "../sort_by_select"
-import { useAppDispatch, useAppSelector } from "@/redux/hooks"
-import { defaultFetchErrorHandler } from "@/redux/api"
-import { TypedUseQuery } from "@reduxjs/toolkit/query/react"
-import { userIsLoggedIn } from "@/features/auth/auth"
-import { clickedLogin } from "@/features/popups/popup_slice"
-import { filterCleared } from "@/features/topbar/filter_slice"
+import { PostCard } from "./post_card"
+import { Post } from "./post_types"
 
 interface props {
     apiQueryHook: TypedUseQuery<Post[], any, any>
@@ -34,7 +32,7 @@ export const PostCards: FC<props> = ({apiQueryHook, extraProps}) => {
         sortBy: useAppSelector(state => state.filter.sortBy),
         ...extraProps
     }
-    var {data: posts, isLoading, error} = apiQueryHook(getPostsProps)
+    const {data: posts, isLoading, error} = apiQueryHook(getPostsProps)
     defaultFetchErrorHandler(error, dispatch)
 
     return (

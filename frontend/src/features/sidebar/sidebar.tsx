@@ -1,15 +1,12 @@
-import { Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar } from "@mui/material";
-import HomeIcon from '@mui/icons-material/Home';
+import ArticleIcon from '@mui/icons-material/Article';
+import CommentIcon from '@mui/icons-material/Comment';
 import CreateIcon from '@mui/icons-material/Create';
 import DraftsIcon from '@mui/icons-material/Drafts';
-import ArticleIcon from '@mui/icons-material/Article';
+import HomeIcon from '@mui/icons-material/Home';
 import ThumbUpOffAltIcon from '@mui/icons-material/ThumbUpOffAlt';
-import CommentIcon from '@mui/icons-material/Comment';
-import { FC } from "react";
+import { Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar } from "@mui/material";
 import { useRouter } from "next/router";
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { clickedLogin } from "../popups/popup_slice";
-import { userIsLoggedIn } from "../auth/auth";
+import { FC } from "react";
 
 const nav = [
     {label: "Home", path: "/", icon: <HomeIcon style={{ fill: "#51361a" }} />},
