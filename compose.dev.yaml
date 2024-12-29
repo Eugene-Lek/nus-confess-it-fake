@@ -1,0 +1,37 @@
+services:
+  db:
+    image: postgres:17.2-alpine
+    container_name: "dev2"
+    ports:
+      - "5434:5432"
+    environment:
+      - POSTGRES_DB=backend
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=abcd1234
+    networks:
+      - fullstack
+    volumes:
+      - ./backend/db_init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  api:
+    build: .
+    container_name: "backend"
+    environment:
+      BACKEND_PORT: "5000"
+      DB_HOST: "db"
+      DB_PORT: "5432"
+      DB_USER_PASSWORD: "abcd1234"
+      FRONTEND_PROTOCOL: "http"
+      FRONTEND_HOST: "localhost"
+      FRONTEND_PORT: "3000"
+      AUTH_SECRET_KEY: "cb5f0520fff86bf1e6df57d445b6f9355114e31d04bb8b268485eaf6ce941c67621c4495fb11cbedf16693c51caa10336a35e55c89edd29e5288125d0f50e5b4b11ee3915c7a3843b190c3d5319b6fe3b86be34558b3f70dc7a47edd55e690a4ec05b38983c94a8ce135ca28491fc18941e40b0cbb686daca3fbacb7e5a3c171953856509c7886c667fc8a2ca85da185d59fae81406ea1119bbaff67e8a303c28c7ab47e87dc21610ee3244bf76fbeaf62d4d8cf0aef3c4186427cd66df893bc785f9d83998489cc75b75d1645232eb2a392b0e81b8ca5c19198b41547fb4bb3c96476fcdb18811ccbcbc11d871e473d4bd82d99f4fe647bca039db96c2eae36    "
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    networks:
+      - fullstack
+
+networks:
+  fullstack:
+    driver: bridge

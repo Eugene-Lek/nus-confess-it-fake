@@ -79,21 +79,11 @@ git clone https://github.com/Eugene-Lek/nus-confess-it-fake.git
 
 
 * **Set up the backend**
-  1. Navigate to the /backend folder via the command line
+  1. Build the backend serve container
   ```
-  cd path/to/backend
+  docker-compose -f compose.dev.yaml build
   ```
-  2. Rename ".env.example" to ".env"
-
-  3. Install dependencies
+  2. Run the server and database containers
   ```
-  go get .
-  ```
-  4. Run the postgres docker container. **(Remember to use your absolute path to init.sql instead!)**
-  ```
-  docker run --name dev -p 5433:5432 -e POSTGRES_PASSWORD=abcd1234 -e POSTGRES_DB=backend -v -v absolute/path/to/init.sql:/docker-entrypoint-initdb.d/init.sql -d postgres
-  ```
-  5. In another terminal in the same directory, run the server
-  ```
-  go run .
+  docker-compose -f compose.dev.yaml up -d
   ```
