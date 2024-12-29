@@ -3,7 +3,7 @@
 
 // Also, these configurations do not need to be kept secret
 
-const BACKEND_SERVER_HOST= "13.228.29.133"
+const BACKEND_SERVER_HOST= process.env.NODE_ENV == "development" ? "localhost": "13.228.29.133" // If node process exists, the env is development. Otherwise, it is prod
 const BACKEND_SERVER_PORT= 5000
 const BACKEND_SERVER_PROTOCOL= "http"
 
