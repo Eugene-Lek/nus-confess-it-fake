@@ -1,5 +1,5 @@
 import { userIsLoggedIn } from "@/features/auth/auth";
-import { useCreatePostMutation, useGetPostByIdQuery, useUpdateDraftToPostMutation, useUpdatePostMutation } from "@/features/content/posts/api_slice";
+import { useGetPostByIdQuery, useUpdateDraftToPostMutation, useUpdatePostMutation } from "@/features/content/posts/api_slice";
 import { PostEditor, postEditorSchema } from "@/features/content/posts/post_editor";
 import { clickedLogin } from "@/features/popups/popup_slice";
 import { hideBothFilters, showBothFilters } from "@/features/topbar/filter_slice";
@@ -26,26 +26,16 @@ export default function EditPost() {
         }
     }, [])      
 
-    const authenticated = userIsLoggedIn()
-    if (!authenticated) {
-        dispatch(clickedLogin())
-        return <></>
-    }
-
     // useFormik hook is like useState, but for forms.
     // It tracks the user's inputs and keeps track of validation errors, if any
     const formState: FormikProps<any> = useFormik({
       validationSchema: postEditorSchema,
-      onSubmit: (input) => {},
+      onSubmit: () => {},
       initialValues: {title: "", body: "", tags: Array(0)}
   })
 
     const postId = useSearchParams().get("postId")
-    if (!postId) {
-      return <></>
-    }
-
-    const {data: post} = useGetPostByIdQuery(postId)
+    const {data: post, error} = useGetPostByIdQuery(postId || "")   
     useEffect(() => {
       // Load in the existing data once it has been fetched
       formState.setFieldValue("title", post?.title || "", true)
@@ -97,7 +87,19 @@ export default function EditPost() {
       } catch (err: any) {
           defaultFetchErrorHandler(err, dispatch)
       }
+    }  
+    
+    const authenticated = userIsLoggedIn()
+    if (!authenticated) {
+        dispatch(clickedLogin())
+        return <></>
     }    
+
+    if (!postId) {
+      router.push("/")
+      return
+    }
+    defaultFetchErrorHandler(error, dispatch)     
 
     return (
         <Box sx={{display: "flex", flexDirection: "column", gap: "15px", px:"40px", paddingTop: "30px", paddingBottom:"200px"}}>
