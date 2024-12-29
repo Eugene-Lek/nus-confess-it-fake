@@ -79,7 +79,7 @@ git clone https://github.com/Eugene-Lek/nus-confess-it-fake.git
 
 
 * **Set up the backend**
-  1. Build the backend serve container
+  1. Build the backend server container
   ```
   docker-compose -f compose.dev.yaml build
   ```
