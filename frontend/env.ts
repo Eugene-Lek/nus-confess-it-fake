@@ -3,7 +3,7 @@
 
 // Also, these configurations do not need to be kept secret
 
-const BACKEND_SERVER_HOST= "localhost"
+const BACKEND_SERVER_HOST= "13.228.29.133"
 const BACKEND_SERVER_PORT= 5000
 const BACKEND_SERVER_PROTOCOL= "http"
 
