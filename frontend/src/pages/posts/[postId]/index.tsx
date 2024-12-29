@@ -8,16 +8,16 @@ import { useRouter } from "next/router";
 
 export default function PostPage() {
     const {postId} = useParams<{postId: string}>()
+
+    const dispatch = useAppDispatch()
+    const router = useRouter()
+
+    const {data: post, error} = useGetPostByIdQuery(postId || "")
     if (!postId) {
-      const router = useRouter()
       router.push("/")
       return
     }
-
-    const dispatch = useAppDispatch()
-
-    var {data: post, error} = useGetPostByIdQuery(postId)
-    defaultFetchErrorHandler(error, dispatch)
+    defaultFetchErrorHandler(error, dispatch)   
 
     if (!post) {
       return
