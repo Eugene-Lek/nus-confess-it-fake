@@ -9,15 +9,15 @@ import { getUser } from "@/features/auth/auth"
 import { Post } from "./post_types"
 
 export const PostEditDeleteMenu: FC<Post> = ({id, author, status}) => {
+    const dispatch = useAppDispatch()
+    const router = useRouter()
+    const [deletePost, {isLoading}] = useDeletePostMutation()
+    const {setDeleteQueryFunc} = useContext(PopUpContext)    
+    
     if (author != getUser() || status == "Deleted") {
         // If the post doesn't belong to the user, they aren't allowed to edit or delete the post
         return <></> 
     }
-
-    const dispatch = useAppDispatch()
-    const router = useRouter()
-    const [deletePost, {isLoading}] = useDeletePostMutation()
-    const {setDeleteQueryFunc} = useContext(PopUpContext)
 
     const menuOptions = [
         {
