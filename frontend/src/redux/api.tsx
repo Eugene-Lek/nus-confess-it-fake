@@ -1,10 +1,12 @@
 import { errorOccured } from '@/features/popups/popup_slice'
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { config } from '../../env'
 import { AppDispatch } from './store'
 
 export const baseApiSlice = createApi({
-  baseQuery: fetchBaseQuery({ baseUrl: config.BACKEND_BASE_URL, credentials: "include"}),
+  baseQuery: fetchBaseQuery({ 
+    baseUrl: `${process.env.NEXT_PUBLIC_BACKEND_PROTOCOL}://${process.env.NEXT_PUBLIC_BACKEND_DOMAIN}/api/v${process.env.NEXT_PUBLIC_API_VERSION}`, 
+    credentials: "include"
+  }),
   tagTypes: ["Post", "Comment"],
   endpoints: () => ({})
 })
