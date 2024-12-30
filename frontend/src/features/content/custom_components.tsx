@@ -2,7 +2,7 @@
 
 import { TextareaAutosize as BaseTextareaAutosize } from '@mui/base/TextareaAutosize';
 import Markdown from 'react-markdown'
-import { styled } from '@mui/system';
+import { Box, styled } from '@mui/system';
 import { FC, PropsWithChildren } from 'react';
 import rehypeRaw from 'rehype-raw';
 import styles from "./content.module.css"
@@ -21,31 +21,33 @@ export const Textarea = styled(BaseTextareaAutosize)(
 
 export const MarkdownBody: FC<PropsWithChildren> = ({children}) => {
     return (
-        <Markdown components={{
-            p(props) {
-                const {node, ...rest} = props
-                return <p className={styles.body} {...rest}/>
-            },
-            strong(props) {
-                const {node, ...rest} = props
-                return <strong className={styles.body} {...rest}/>
-            },
-            em(props) {
-                const {node, ...rest} = props
-                return <em className={styles.body} {...rest}/>
-            },
-            u(props) {
-                const {node, ...rest} = props
-                return <u className={styles.body} {...rest}/>
-            },
-            li(props) {
-                const {node, ...rest} = props
-                return <li className={styles.body} {...rest}/>
-            },
-            ol(props) {
-                const {node, ...rest} = props
-                return <ol style={{margin: 0}} {...rest}/>
-            }                        
-        }} rehypePlugins={[rehypeRaw]}>{String(children)}</Markdown>
+        <Box sx={{display: "flex", flexDirection: "column", gap: "10px"}}>
+            <Markdown components={{
+                p(props) {
+                    const {node, ...rest} = props
+                    return <p className={styles.body} {...rest}/>
+                },
+                strong(props) {
+                    const {node, ...rest} = props
+                    return <strong className={styles.body} {...rest}/>
+                },
+                em(props) {
+                    const {node, ...rest} = props
+                    return <em className={styles.body} {...rest}/>
+                },
+                u(props) {
+                    const {node, ...rest} = props
+                    return <u className={styles.body} {...rest}/>
+                },
+                li(props) {
+                    const {node, ...rest} = props
+                    return <li className={styles.body} {...rest}/>
+                },
+                ol(props) {
+                    const {node, ...rest} = props
+                    return <ol style={{margin: 0}} {...rest}/>
+                }                        
+            }} rehypePlugins={[rehypeRaw]}>{String(children)}</Markdown>
+        </Box>
     )
 }
