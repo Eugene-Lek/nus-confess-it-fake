@@ -9,23 +9,37 @@ import { KeywordFilter } from './keyword_filter';
 import { LoginSignUpButtons } from './login_signup_buttons';
 import { LogoutButton } from './logout_button';
 import { TagFilter } from './tag_filter';
+import MenuIcon from '@mui/icons-material/Menu';
+import { useAppDispatch } from '@/redux/hooks';
+import { clickedMenu } from '../sidebar/sidebar_slice';
+import styles from "./topbar.module.css"
 
 
 export const Topbar: FC<PropsWithChildren> = () => {
     const authenticated = userIsLoggedIn()
+    const dispatch = useAppDispatch()
 
     return (
         <>
             <AppBar position='fixed' sx={{borderColor: "#AEAEAE", backgroundColor: "white", zIndex: (theme) => theme.zIndex.drawer + 1}}>
-                <Toolbar sx={{display: 'flex', justifyContent: 'space-between'}}>
+                <Toolbar 
+                    className={`${styles["topbar-padding"]} ${styles["topbar-height"]}`} 
+                    sx={{display: 'flex', justifyContent: 'space-between'}}
+                >
                     <Typography 
                         variant='h5' 
-                        color="space"
-                        sx={{display: {xs: "none", sm: "none", md: "block", lg: "block"}}}
+                        color="darkBrown"
+                        className='hide-on-xs show-on-medium'
                     >
                         NUSConfessITFake
                     </Typography>
-                    <Box sx={{ display: 'flex', gap: "20px", alignItems: "center"}}>
+                    <Box className='show-on-xs hide-on-medium'>
+                        <MenuIcon 
+                            onClick={() => dispatch(clickedMenu())}
+                            sx={{color: 'black'}}
+                        />
+                    </Box>
+                    <Box className={styles["filter-group"]}>
                         <KeywordFilter/>
                         <TagFilter/>
                     </Box>
