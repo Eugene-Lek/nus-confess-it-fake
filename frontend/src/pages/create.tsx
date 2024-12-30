@@ -10,6 +10,7 @@ import { Box, Typography } from "@mui/material";
 import { FormikProps, useFormik } from "formik";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
+import {v4 as uuidv4} from 'uuid';
 
 export default function CreatePost() {
     const dispatch = useAppDispatch()
@@ -39,7 +40,7 @@ export default function CreatePost() {
       try {      
         const post = {
           ...formState.values,
-          id: crypto.randomUUID(),
+          id: uuidv4(),
           status: "Published"
         }
         await createPost(post).unwrap()
@@ -54,7 +55,7 @@ export default function CreatePost() {
       try {      
         const post = {
           ...formState.values,
-          id: crypto.randomUUID(),
+          id: uuidv4(),
           status: "Draft"
         }
         await createPost(post).unwrap()
