@@ -1,0 +1,8 @@
+http://{$HOST}.nip.io {
+    handle /api/* {
+        reverse_proxy {$HOST}:5000
+    }
+    handle {
+        reverse_proxy {$HOST}:3000
+    }    
+}
