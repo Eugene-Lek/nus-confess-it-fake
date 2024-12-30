@@ -1,0 +1,65 @@
+services:
+  db:
+    image: postgres:17.2-alpine
+    container_name: "pg"
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_DB=backend
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=canBeAnything
+    networks:
+      - fullstack
+    volumes:
+      - ./db_init_prod.sql:/docker-entrypoint-initdb.d/init.sql
+      - database_postgres:/var/lib/postgresql/data
+
+  caddy:
+    image: caddy:2.9-alpine
+    container_name: "caddy"
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      HOST: "[Your EC2 instance's public IP]"      
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+    depends_on:
+      - db
+      - api               
+    networks:
+      - fullstack    
+
+  ui:
+    image: "[Your ui image name]"
+    container_name: "frontend"   
+    ports:
+      - "3000:3000"
+    networks:
+      - fullstack
+
+  api:
+    image: "[Your api image name]"
+    container_name: "backend"
+    environment:
+      APP_ENV: "prod"    
+      BACKEND_PORT: "5000"
+      DB_HOST: "db"
+      DB_PORT: "5432"
+      DB_USER_PASSWORD: "[the password of user 'backend', defined in db_init_prod]"
+      FRONTEND_PROTOCOL: "http"
+      FRONTEND_DOMAIN: "[Your EC2 instance's public IP].nip.io" 
+      AUTH_SECRET_KEY: "[Your JWT secret key]"
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    networks:
+      - fullstack
+
+volumes:
+  database_postgres:      
+
+networks:
+  fullstack:
+    driver: bridge

@@ -1,0 +1,8 @@
+services:
+  ui:
+    build: "./frontend"
+    image: "[Your ui image name]"
+
+  api:
+    build: "./backend"   
+    image: "[Your api image name]"
