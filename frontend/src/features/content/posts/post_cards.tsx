@@ -7,6 +7,7 @@ import { FC, useEffect } from "react"
 import { SortBySelect } from "../sort_by_select"
 import { PostCard } from "./post_card"
 import { Post } from "./post_types"
+import styles from "../content.module.css"
 
 interface props {
     apiQueryHook: TypedUseQuery<Post[], any, any>
@@ -36,7 +37,7 @@ export const PostCards: FC<props> = ({apiQueryHook, extraProps}) => {
     defaultFetchErrorHandler(error, dispatch)
 
     return (
-        <Box sx={{px:"40px", paddingTop: "25px", paddingBottom:"200px", display: "flex", flexDirection:"column", gap: "30px"}}>
+        <Box className={`maximise-width ${styles["posts-comments-page"]}`}>
             <Box sx={{display: "flex", gap: "25px"}}>
                 <SortBySelect/>
                 {isLoading

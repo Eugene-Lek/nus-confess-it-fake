@@ -9,6 +9,7 @@ import { FC, useEffect } from "react"
 import { SortBySelect } from "../sort_by_select"
 import { CommentCardInListing, CommentCardUnderPost } from "./comment_card"
 import { Comment } from "./comment_types"
+import styles from "../content.module.css"
 
 interface props1 {
     comments: Comment[]
@@ -70,7 +71,7 @@ export const CommentCardsInListing: FC<props2> = ({apiQueryHook, extraProps}) =>
     defaultFetchErrorHandler(error, dispatch)
 
     return (
-        <Box sx={{px:"40px", paddingTop: "25px", paddingBottom:"200px", display: "flex", flexDirection:"column", gap: "30px"}}>
+        <Box className={`maximise-width ${styles["posts-comments-page"]}`}>
             <Box sx={{display: "flex", gap: "25px"}}>
                 <SortBySelect/>
                 {isLoading

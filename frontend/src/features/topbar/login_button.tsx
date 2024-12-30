@@ -7,6 +7,6 @@ export const LoginButton: FC = () => {
     const dispatch = useAppDispatch()
 
     return (
-        <Button variant="contained" onClick={() => dispatch(clickedLogin())} color="khaki">Login</Button>
+        <Button variant="contained" onClick={() => dispatch(clickedLogin())} color="lightBrown">Login</Button>
     )
 }

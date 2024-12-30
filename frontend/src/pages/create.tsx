@@ -11,6 +11,7 @@ import { FormikProps, useFormik } from "formik";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import {v4 as uuidv4} from 'uuid';
+import styles from "../features/content/content.module.css"
 
 export default function CreatePost() {
     const dispatch = useAppDispatch()
@@ -73,12 +74,12 @@ export default function CreatePost() {
     }    
 
     return (
-        <Box sx={{display: "flex", flexDirection: "column", gap: "15px", px:"40px", paddingTop: "30px", paddingBottom:"200px"}}>
+        <Box className={`maximise-width ${styles["create-edit-post-page"]}`} >
             <Typography variant="h5" fontWeight={"bold"} color="space">Create Post</Typography>
             <PostEditor formState={formState}/>            
             <Box sx={{display:"flex", gap:"20px", marginLeft: "auto", marginRight: 0}}>
-              <LoadingButton variant="contained" color="khaki" onClick={onClickSave} loading={isLoading} disabled={Object.keys(formState.errors).length > 0}>Save Draft</LoadingButton>
-              <LoadingButton variant="contained" color="khaki" onClick={onClickPost} loading={isLoading} disabled={Object.keys(formState.errors).length > 0}>Post</LoadingButton>
+              <LoadingButton variant="contained" color="lightBrown" onClick={onClickSave} loading={isLoading} disabled={Object.keys(formState.errors).length > 0}>Save Draft</LoadingButton>
+              <LoadingButton variant="contained" color="lightBrown" onClick={onClickPost} loading={isLoading} disabled={Object.keys(formState.errors).length > 0}>Post</LoadingButton>
             </Box>            
         </Box>
     )

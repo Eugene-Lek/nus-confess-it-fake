@@ -3,18 +3,18 @@ import { createTheme } from "@mui/material";
 const defaultTheme = createTheme()
 export const Theme = createTheme({
     palette: {
-        space: defaultTheme.palette.augmentColor({
+        darkBrown: defaultTheme.palette.augmentColor({
             color: {
                 main: "#51361a"
             },
-            name: "space"
+            name: "darkBrown"
         }), 
         orange: defaultTheme.palette.augmentColor({
             color: {
                 main: "#F3A953"
             }
         }),
-        khaki: defaultTheme.palette.augmentColor({
+        lightBrown: defaultTheme.palette.augmentColor({
             color: {
                 main: "#946846"
             }
@@ -31,15 +31,15 @@ export const Theme = createTheme({
 // Augment the palette to include this palette
 declare module '@mui/material/styles' {
     interface Palette {
-        space?: Palette["primary"];
+        darkBrown?: Palette["primary"];
         orange: Palette["primary"];
-        khaki: Palette["primary"];
+        lightBrown: Palette["primary"];
         offWhite: Palette["primary"];
     }
     interface PaletteOptions {
-        space?: PaletteOptions["primary"];
+        darkBrown?: PaletteOptions["primary"];
         orange: PaletteOptions["primary"];
-        khaki: PaletteOptions["primary"];
+        lightBrown: PaletteOptions["primary"];
         offWhite: PaletteOptions["primary"];
     }
 }
@@ -47,18 +47,27 @@ declare module '@mui/material/styles' {
 // Update the Button's color options to include these options
 declare module '@mui/material/Button' {
     interface ButtonPropsColorOverrides {
-        space: true, 
+        darkBrown: true, 
         orange: true,
-        khaki: true,
+        lightBrown: true,
         offWhite: true,
     }
   }
 
-  declare module '@mui/material/Typography' {
+declare module '@mui/material/Typography' {
     interface TypographyPropsColorOverrides {
-        space: true, 
+        darkBrown: true, 
         orange: true,
-        khaki: true,
+        lightBrown: true,
+        offWhite: true,
+    }
+  }
+
+declare module '@mui/material' {
+    interface SvgIconPropsColorOverrides {
+        darkBrown: true, 
+        orange: true,
+        lightBrown: true,
         offWhite: true,
     }
   }
