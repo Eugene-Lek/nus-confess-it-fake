@@ -30,8 +30,12 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
+# prod env files
+.env.production
+
 # prod docker compose file
-compose.prod.yaml
+compose.prodDeploy.yaml
+compose.prodBuild.yaml
 
 # vercel
 .vercel
