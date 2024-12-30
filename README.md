@@ -54,8 +54,6 @@ Frontend (src folder)
  * **styles**
    * styles that are used by all features of the website
 
-**Note:** An env.ts file is used in the root of the /frontend folder instead of .env because the frontend will be statically served by an S3 bucket
-
 ## Setting up the development environment
 * **Clone the project**
 ```
