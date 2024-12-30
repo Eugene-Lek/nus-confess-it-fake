@@ -1,19 +1,19 @@
-import { Box, CircularProgress, Typography } from "@mui/material"
-import SendIcon from '@mui/icons-material/Send';
-import { Cancel } from "@mui/icons-material"
-import { ParentCommentCard } from "./parent_comment"
-import { Textarea } from "../custom_components"
-import { useAppDispatch, } from "@/redux/hooks";
-import { clickedLogin } from "../../popups/popup_slice";
-import { MouseEvent, useContext, useEffect, useState } from "react";
-import { useCreateCommentMutation, useUpdateCommentMutation } from "./api_slice";
-import { defaultFetchErrorHandler } from "@/redux/api";
 import { userIsLoggedIn } from "@/features/auth/auth";
-import { convertToMarkdown } from "../utils";
-import { NewComment } from "./comment_types";
-import { PostContext } from "../posts/post";
+import { defaultFetchErrorHandler } from "@/redux/api";
+import { useAppDispatch, } from "@/redux/hooks";
+import { Cancel } from "@mui/icons-material";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import {v4 as uuidv4} from 'uuid';
+import SendIcon from '@mui/icons-material/Send';
+import { Box, CircularProgress, Typography } from "@mui/material";
+import { MouseEvent, useContext, useEffect, useState } from "react";
+import { v4 as uuidv4 } from 'uuid';
+import { clickedLogin } from "../../popups/popup_slice";
+import { Textarea } from "../custom_components";
+import { PostContext } from "../posts/post";
+import { convertToMarkdown } from "../utils";
+import { useCreateCommentMutation, useUpdateCommentMutation } from "./api_slice";
+import { NewComment } from "./comment_types";
+import { ParentCommentCard } from "./parent_comment";
 
 export const CommentEditor = () => {
     // Fetch the post's context
@@ -88,6 +88,7 @@ export const CommentEditor = () => {
             setReplyTo(commentToEdit.parentComment)
         }
     }
+    
     return (
         <Box position="fixed" sx={{ display: "flex", alignItems:"flex-end", gap:"5px", top: 'auto', bottom: 0,  width: "calc(100% - 270px)", bgcolor: "#FFFFFF", boxShadow:2, py: 1, px: 1, borderRadius: 2}}>
             <Box sx={{display: "flex", flexDirection: "column", width: "100%"}}>
@@ -107,7 +108,7 @@ export const CommentEditor = () => {
                         </Box>
                         <Cancel sx={{my:1, cursor:"pointer"}} onClick={() => {if (setReplyTo) setReplyTo(null)}}/> 
                 </Box>    
-                : <></>}                
+                : <></>}                    
                 <Textarea
                     maxRows={4} 
                     placeholder={"Add a comment"} 
