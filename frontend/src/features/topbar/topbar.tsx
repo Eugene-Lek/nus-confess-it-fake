@@ -33,6 +33,8 @@ export const Topbar: FC<PropsWithChildren> = () => {
                     >
                         NUSConfessITFake
                     </Typography>
+                    {/*The Menu Icon must be wrapped with a box so that the 'hide-on-medium' class 
+                    overrides the default "display" of icon button */}
                     <Box className='show-on-xs hide-on-medium'>
                         <MenuIcon 
                             onClick={() => dispatch(clickedMenu())}
