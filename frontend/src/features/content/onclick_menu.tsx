@@ -1,4 +1,4 @@
-import MenuIcon from '@mui/icons-material/Menu';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { ClickAwayListener, Grow, MenuItem, MenuList, Paper, Popper } from "@mui/material";
 import { FC, MouseEvent, SyntheticEvent, useEffect, useRef, useState } from "react";
 
@@ -48,7 +48,7 @@ export const OnClickMenu: FC<props> = ({options}) => {
 
     return (
         <>
-            <MenuIcon
+            <MoreHorizIcon
                 component="svg"
                 ref={anchorRef}
                 id="menu-icon"
