@@ -1,5 +1,3 @@
-import { config } from '../../../env'
-
 export function loggedIn(username: string) {
   if (typeof localStorage != undefined) {
     localStorage.setItem("username", username)
@@ -32,5 +30,5 @@ function getCookieByName(name: string) {
 // Read the cookie directly from local storage in order to get the most
 // up to date status on the user's authentication
 export function userIsLoggedIn() {
-  return !!getCookieByName(config.AUTH_COOKIE_NAME)
+  return !!getCookieByName(process.env.NEXT_PUBLIC_AUTH_COOKIE_NAME || "")
 }
