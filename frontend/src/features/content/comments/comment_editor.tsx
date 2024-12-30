@@ -13,6 +13,7 @@ import { convertToMarkdown } from "../utils";
 import { NewComment } from "./comment_types";
 import { PostContext } from "../posts/post";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import {v4 as uuidv4} from 'uuid';
 
 export const CommentEditor = () => {
     // Fetch the post's context
@@ -49,7 +50,7 @@ export const CommentEditor = () => {
         }
         const editComment = commentToEdit?.id // commentToEdit.id exists, that implies we are editing an existing comment
         const newComment: NewComment = {
-            id: editComment || crypto.randomUUID(),
+            id: editComment || uuidv4(),
             postId: postId,
             body: convertToMarkdown(draft),
             parentId: replyTo?.id || "",
