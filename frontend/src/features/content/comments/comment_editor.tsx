@@ -14,6 +14,7 @@ import { convertToMarkdown } from "../utils";
 import { useCreateCommentMutation, useUpdateCommentMutation } from "./api_slice";
 import { NewComment } from "./comment_types";
 import { ParentCommentCard } from "./parent_comment";
+import styles from "../content.module.css"
 
 export const CommentEditor = () => {
     // Fetch the post's context
@@ -90,7 +91,7 @@ export const CommentEditor = () => {
     }
     
     return (
-        <Box position="fixed" sx={{ display: "flex", alignItems:"flex-end", gap:"5px", top: 'auto', bottom: 0,  width: "calc(100% - 270px)", bgcolor: "#FFFFFF", boxShadow:2, py: 1, px: 1, borderRadius: 2}}>
+        <Box position="fixed" className={styles["comment-editor"]}>
             <Box sx={{display: "flex", flexDirection: "column", width: "100%"}}>
                 {editComment
                         ? <Box sx={{display: "flex", gap: "10px"}}>

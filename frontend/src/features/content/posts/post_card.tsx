@@ -17,7 +17,7 @@ export const PostCard = (post: Post) => {
     }
 
     return (
-        <Box onClick={onClick} sx={{display: "flex", flexDirection: "column", gap: "5px", border: 1.7, borderRadius:10, borderColor: "#d3d3d3", py: 1, px: 5, cursor:"pointer"}}>
+        <Box onClick={onClick} className="maximise-width" sx={{display: "flex", flexDirection: "column", gap: "5px", border: 1.7, borderRadius:10, borderColor: "#d3d3d3", py: 1, px: 5, cursor:"pointer"}}>
             <Box sx={{display: "flex", justifyContent: "space-between", alignItems: "flex-start"}}>
                 <Box>
                     {post.status == "Deleted"

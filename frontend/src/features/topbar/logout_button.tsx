@@ -38,7 +38,7 @@ export const LogoutButton: FC = () => {
                 variant="contained" 
                 onClick={handleLogout} 
                 loading={isLoading} 
-                color="khaki"
+                color="lightBrown"
                 sx={{display: {xs: "none", sm: "none", md: "none", lg: "block"}}}
             >Logout
             </LoadingButton>        

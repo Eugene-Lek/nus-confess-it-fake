@@ -4,6 +4,7 @@ import { Autocomplete, Box, TextField } from "@mui/material";
 import { FC } from "react";
 import { useGetTagsQuery } from "../content/posts/api_slice";
 import { tagsUpdated } from "./filter_slice";
+import styles from "./topbar.module.css"
 
 export const TagFilter: FC = () => {
     const dispatch = useAppDispatch()
@@ -31,13 +32,7 @@ export const TagFilter: FC = () => {
                                     sx: {display: "flex", overflowX: "auto"},
                                     ...restInputProps,
                                     startAdornment: (
-                                        <Box sx={{
-                                            display: "flex", // Make the selected options flex row-wise
-                                            overflowX: 'auto', 
-                                            maxWidth: {xs: "60px", sm: "115px", md: "135px", lg: "185px"}, // Restrict the width of the selected tags to leave room for the free text box
-                                            scrollbarWidth: "thin"
-                                        }}
-                                        >
+                                        <Box className={styles["selected-tags"]}>
                                         {startAdornment}
                                         </Box>
                                     ),
@@ -47,11 +42,8 @@ export const TagFilter: FC = () => {
                         );
                     }
                     }
-                sx={{
-                    visibility: hide ? "hidden": "visible", 
-                    width: {xs: "175px", sm: "225px", md: "250px", lg: "300px"},
-                    my: 1
-                }}
+                sx={{ visibility: hide ? "hidden": "visible"}}
+                className={styles["filter"]}
                 onChange={(e, newValue) => dispatch(tagsUpdated(newValue))}
                 />
     )

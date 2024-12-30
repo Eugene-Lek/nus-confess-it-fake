@@ -1,3 +1,49 @@
 html {
-	overflow: scroll;
+	overflow-y: scroll;
+}
+
+.maximise-width {
+    box-sizing: border-box;
+    width: 100%
+}
+
+
+/* Extra Small */
+@media screen and (min-width: 0px) {
+    .hide-on-xs{
+        display: none
+    }
+    .show-on-xs{
+        display: block
+    }    
+}
+
+/* Small */
+@media screen and (min-width: 600px) {
+    .hide-on-small{
+        display: none
+    }
+    .show-on-small{
+        display: block
+    }       
+}
+
+/* Medium */
+@media screen and (min-width: 900px) {
+    .hide-on-medium{
+        display: none
+    }
+    .show-on-medium{
+        display: block
+    }       
+}
+
+/* Large */
+@media screen and (min-width: 1200px) {
+    .hide-on-large{
+        display: none
+    }
+    .show-on-large{
+        display: block
+    }       
 }

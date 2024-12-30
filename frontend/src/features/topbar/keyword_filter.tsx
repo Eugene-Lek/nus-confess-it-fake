@@ -3,6 +3,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import { IconButton, TextField } from "@mui/material";
 import { FC, useEffect, useState } from "react";
 import { queryUpdated } from "./filter_slice";
+import styles from "./topbar.module.css"
 
 export const KeywordFilter: FC = () => {
     const dispatch = useAppDispatch()
@@ -17,17 +18,17 @@ export const KeywordFilter: FC = () => {
 
     const hide = useAppSelector((state) => state.filter.hideQueryFilter)
     return (
-        <form onSubmit={onSubmit} style={{visibility: hide ? "hidden": "visible"}} >
+        <form onSubmit={onSubmit} style={{visibility: hide ? "hidden": "visible", display: "flex"}} >
             <TextField 
                 value={keywords}
                 label="Search by keyword(s)" 
                 variant="outlined" 
                 size="small" 
                 rows={1}
-                sx={{width: {xs: "175px", sm: "225px", md: "250px", lg: "300px"}}}
+                className={styles["filter"]}
                 onChange={(e) => {setKeywords(e.target.value)}}
                 onBlur={onSubmit}/>
-            <IconButton type="submit" aria-label="search" onClick={onSubmit}>
+            <IconButton type="submit" aria-label="search" onClick={onSubmit} className={styles["search-icon"]}>
                 <SearchIcon style={{ fill: "#8D99AE" }} />
             </IconButton>
         </form>

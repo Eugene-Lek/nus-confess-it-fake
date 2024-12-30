@@ -16,10 +16,10 @@ export const LoginSignUpButtons = () => {
 
     return (
         <>
-            <Box sx={{display: {xs: "block", sm: "block", md: "block", lg: "none"}}}>
+            <Box className="hide-on-large">
                 <OnClickMenu options={menuOptions}/>
             </Box>
-            <Box sx={{display: {xs: "none", sm: "none", md: "none", lg: "flex"}, gap: "20px"}}>
+            <Box className="hide-on-xs show-on-large" sx={{display: {lg: "flex"}, gap: "20px"}}>
                 <LoginButton/>
                 <SignUpButton/>
             </Box>     

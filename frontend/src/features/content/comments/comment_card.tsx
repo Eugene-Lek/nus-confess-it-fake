@@ -73,7 +73,7 @@ export const CommentCardUnderPost = (comment: Comment) => {
     ]
 
     return (
-        <Box id={comment.id} sx={{display: "flex", flexDirection: "column", gap: "5px", border: 1.7, borderRadius:10, borderColor: "#d3d3d3", py: 1, px: 5}}>
+        <Box id={comment.id} className="maximise-width" sx={{display: "flex", flexDirection: "column", gap: "5px", border: 1.7, borderRadius:10, borderColor: "#d3d3d3", py: 1, px: 5}}>
             <CommentCardCore comment={comment} menuOptions={menuOptions}/>   
             <Box sx={{display: "flex", flexDirection: "row", gap: "25px"}}>
                 <VoteBox {...comment}/>
@@ -110,7 +110,8 @@ export const CommentCardInListing = (comment: Comment) => {
     ]
 
     return (
-        <Box id={comment.id} 
+        <Box id={comment.id}
+             className="maximise-width" 
              sx={{display: "flex", flexDirection: "column", gap: "5px", border: 1.7, borderRadius:10, borderColor: "#d3d3d3", py: 1, px: 5}}
              onClick={() => router.push(`posts/${comment.postId}?${scrollToParamName}=${comment.id}`)}             
         >
