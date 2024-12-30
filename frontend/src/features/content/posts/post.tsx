@@ -15,6 +15,7 @@ import { Post } from "./post_types";
 import { hideBothFilters, showBothFilters } from "@/features/topbar/filter_slice";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useRouter } from "next/router";
+import styles from "../content.module.css"
 
 export const scrollToParamName = "scrollTo"
 
@@ -96,7 +97,7 @@ export const PostComponent = (post: Post) => {
 
     return (
         <PostContext.Provider value={{postId: post.id, replyTo, setReplyTo, commentToEdit, setCommentToEdit, scrollToRef}}>
-            <Box sx={{display: "flex", flexDirection: "column", gap: "15px", px:"40px", paddingTop: "30px", paddingBottom:"200px"}}>
+            <Box className={styles["post-page"]}>
                 <Box sx={{display: "flex", flexDirection: "column", gap: "5px"}}>
                     <ArrowBackIcon onClick={onClickBack} sx={{cursor: "pointer"}}/>
                     <Box sx={{display: "flex", justifyContent: "space-between", alignItems: "flex-start"}}>
