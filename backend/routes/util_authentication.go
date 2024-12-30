@@ -10,6 +10,14 @@ import (
 var AuthSecretKey []byte
 const authCookieName = "auth"
 
+func makeCookie(value string) *http.Cookie {
+	return &http.Cookie{
+		Name: authCookieName,
+		Value: value,
+		Path: "/",
+	}
+}
+
 func createAuthCookie(username string) (*http.Cookie, error) {	
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub": username,
@@ -23,22 +31,15 @@ func createAuthCookie(username string) (*http.Cookie, error) {
 		return nil, err
 	}
 
-	return &http.Cookie{
-		Name: authCookieName,
-		Value: signedJWT,
-		Domain: "localhost",
-		Path: "/",
-		Expires: time.Now().Add(24 * time.Hour),
-		// Secure: true, // Only set to true in production
-	}, nil
+	cookie := makeCookie(signedJWT)
+	cookie.Expires = time.Now().Add(24 * time.Hour)
+
+	return cookie, nil
 }
 
 func createExpiredAuthCookie() *http.Cookie {
-	return &http.Cookie{
-		Name: authCookieName,
-		Value: "",
-		Domain: "localhost",
-		Path: "/",
-		MaxAge: -1,
-	}
+	cookie := makeCookie("")
+	cookie.MaxAge = -1
+
+	return cookie
 }

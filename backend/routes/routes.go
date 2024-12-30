@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 
@@ -79,7 +80,7 @@ func NewRouter(postgres *postgres.PostgresStore, universalTranslator *ut.Univers
 	// Accept requests that come from the frontend domain
 	headers := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
 	methods := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"})
-	origins := handlers.AllowedOrigins([]string{os.Getenv("FRONTEND_URL")})
+	origins := handlers.AllowedOrigins([]string{fmt.Sprintf("%v://%v", os.Getenv("FRONTEND_PROTOCOL"), os.Getenv("FRONTEND_DOMAIN"))})
 	creds := handlers.AllowCredentials()
 
 	return handlers.CORS(headers, methods, origins, creds)(router)
