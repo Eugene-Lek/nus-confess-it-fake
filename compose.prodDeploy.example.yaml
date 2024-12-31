@@ -47,7 +47,7 @@ services:
       DB_HOST: "db"
       DB_PORT: "5432"
       DB_USER_PASSWORD: "[the password of user 'backend', defined in db_init_prod]"
-      FRONTEND_PROTOCOL: "http"
+      FRONTEND_PROTOCOL: "https"
       FRONTEND_DOMAIN: "[Your EC2 instance's public IP].nip.io" 
       AUTH_SECRET_KEY: "[Your JWT secret key]"
     ports:
