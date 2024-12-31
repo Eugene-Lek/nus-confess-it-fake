@@ -14,6 +14,7 @@ import { VoteBox } from "../vote_box";
 import { useDeleteCommentMutation } from "./api_slice";
 import { Comment } from "./comment_types";
 import { ParentCommentCard } from "./parent_comment";
+import styles from "../content.module.css"
 
 interface coreProps {
     comment: Comment
@@ -73,7 +74,7 @@ export const CommentCardUnderPost = (comment: Comment) => {
     ]
 
     return (
-        <Box id={comment.id} className="maximise-width" sx={{display: "flex", flexDirection: "column", gap: "5px", border: 1.7, borderRadius:10, borderColor: "#d3d3d3", py: 1, px: 5}}>
+        <Box id={comment.id} className={`maximise-width ${styles.card}`}>
             <CommentCardCore comment={comment} menuOptions={menuOptions}/>   
             <Box sx={{display: "flex", flexDirection: "row", gap: "25px"}}>
                 <VoteBox {...comment}/>
@@ -111,8 +112,7 @@ export const CommentCardInListing = (comment: Comment) => {
 
     return (
         <Box id={comment.id}
-             className="maximise-width" 
-             sx={{display: "flex", flexDirection: "column", gap: "5px", border: 1.7, borderRadius:10, borderColor: "#d3d3d3", py: 1, px: 5}}
+             className={`maximise-width ${styles.card}`}             
              onClick={() => router.push(`posts/${comment.postId}?${scrollToParamName}=${comment.id}`)}             
         >
             <CommentCardCore comment={comment} menuOptions={menuOptions}/>
