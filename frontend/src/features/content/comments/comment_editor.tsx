@@ -80,6 +80,9 @@ export const CommentEditor = () => {
         if (setCommentToEdit) {
             setCommentToEdit(null)
         }
+        if (setReplyTo) {
+            setReplyTo(null)
+        }
     }
 
     const editComment = commentToEdit?.id // If commentToEdit.id exists, that implies we are editing an existing comment

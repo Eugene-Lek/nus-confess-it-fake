@@ -77,6 +77,7 @@ export const PostComponent = (post: Post) => {
             if (lastCommentId) {
                 document.getElementById(lastCommentId)?.scrollIntoView({behavior: "smooth", block: "center"})
             }
+            scrollToRef.current = "" // clear the ref after the scroll has been executed
         }
 
     }, [comments])
