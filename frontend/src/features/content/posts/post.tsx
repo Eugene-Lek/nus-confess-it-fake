@@ -38,7 +38,6 @@ export const PostContext = createContext<props>({
 })
 
 export const PostComponent = (post: Post) => {
-    const scrollTo = useSearchParams().get(scrollToParamName)
     const dispatch = useAppDispatch()
 
     // Hide the keywords and tag filter in the top bar since they are irrelevant
@@ -54,30 +53,21 @@ export const PostComponent = (post: Post) => {
 
     const {data: comments, isLoading, error} = useGetCommentsByPostIdQuery(post.id)
     defaultFetchErrorHandler(error, dispatch)
-    
-    const alreadyInitScrolledRef = useRef(false)
-    const scrollToRef = useRef("") // Controls which element to scroll to upon comment update (if any)
+
+    const scrollTo = useSearchParams().get(scrollToParamName)
+    const scrollToRef = useRef(scrollTo || "") // Controls which element to scroll to upon comment update (if any)
     useEffect(() => {
         if (!comments) {
             // If the comments have not been loaded yet, do not execute any scroll
             return
         }
 
-        if (scrollTo && typeof scrollTo == "string" && !alreadyInitScrolledRef.current) {
+        if (scrollToRef.current) {
             // Scroll to a particular comment in the post if indicated in the url
-            document.getElementById(scrollTo)?.scrollIntoView({behavior: "smooth", block: "center"})
+            document.getElementById(scrollToRef.current)?.scrollIntoView({behavior: "smooth", block: "center"})
 
-            // Only execute the scroll instruction indicated in the url once
-            alreadyInitScrolledRef.current = true
-
-        } else if (scrollToRef.current){
-            // If an element has been set, scroll to it 
-            // This is used to scroll to a comment after it has been created or edited
-            const lastCommentId = comments?.slice(-1)[0].id
-            if (lastCommentId) {
-                document.getElementById(lastCommentId)?.scrollIntoView({behavior: "smooth", block: "center"})
-            }
-            scrollToRef.current = "" // clear the ref after the scroll has been executed
+            // clear the ref after the scroll has been executed
+            scrollToRef.current = "" 
         }
 
     }, [comments])
