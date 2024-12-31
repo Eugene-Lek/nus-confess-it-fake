@@ -5,6 +5,15 @@
     border-color: #cdced6;   
 }
 
+.card {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    border: 1.7px solid;
+    border-radius: 40px;
+    border-color: #d3d3d3;
+}
+
 .create-edit-post-page {
     display: flex;
     flex-direction: column;
@@ -43,13 +52,16 @@
         width: 92%;
     }
     .posts-comments-page {
-        padding: 25px 10px 200px 10px;
+        padding: 25px 0px 200px 0px;
     }
     .post-page {
-        padding: 25px 10px 200px 10px;
+        padding: 25px 0px 200px 0px;
     }    
     .create-edit-post-page {
-        padding: 30px 10px 200px 10px;     
+        padding: 30px 0px 200px 0px;     
+    }
+    .card {
+        padding: 10px 25px 8px 25px;        
     }
 }
 
@@ -66,6 +78,9 @@
     }     
     .create-edit-post-page {
         padding: 30px 40px 200px 40px;     
+    }    
+    .card {
+        padding: 8px 40px 8px 40px;        
     }    
 }
 
