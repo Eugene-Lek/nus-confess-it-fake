@@ -11,6 +11,12 @@ export function loggedOut() {
 }
 
 export function getUser() {
+  if (!userIsLoggedIn()) {
+    // If the cookie has expired, clear the username from the local storage too
+    localStorage.removeItem("username")
+    return ""
+  }
+
   if (typeof localStorage != undefined) {
     return localStorage.getItem("username") || ""
   }
