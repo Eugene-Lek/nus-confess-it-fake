@@ -57,6 +57,7 @@ const SideBarContents = () => {
 
 export const SideBar: FC = () => {
     const open = useAppSelector(state => state.sideBar.open)
+    const dispatch = useAppDispatch()
 
     return (
       <>
@@ -80,6 +81,7 @@ export const SideBar: FC = () => {
             flexShrink: 0,
             [`& .MuiDrawer-paper`]: { width: "240px", boxSizing: 'border-box' },
           }}
+          onClose={() => {dispatch(clickedMenu())}}
         >
           <SideBarContents/>
         </Drawer>             
