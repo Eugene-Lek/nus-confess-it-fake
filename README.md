@@ -26,6 +26,7 @@ Other nice features:
 * Users are prompted to log in if they attempt an action/page visit that requires logging in
 * Input validation and error messages in both frontend and backend
 * Logging
+* Both desktop and mobile viewing are supported
 
 ## Project Architecture
 Backend
