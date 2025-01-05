@@ -15,9 +15,10 @@ interface props {
         author?: string
         likedBy?: string
     }
+    title: string
 }
 
-export const PostCards: FC<props> = ({apiQueryHook, extraProps}) => {
+export const PostCards: FC<props> = ({apiQueryHook, extraProps, title}) => {
     const dispatch = useAppDispatch()
 
     // When the user navigates to another page (i.e. when the component dismounts),
@@ -38,6 +39,7 @@ export const PostCards: FC<props> = ({apiQueryHook, extraProps}) => {
 
     return (
         <Box className={`maximise-width ${styles["posts-comments-page"]}`}>
+            <Typography variant="h5" fontWeight={"bold"}>{title}</Typography>            
             <Box sx={{display: "flex", gap: "25px"}}>
                 <SortBySelect/>
                 {isLoading

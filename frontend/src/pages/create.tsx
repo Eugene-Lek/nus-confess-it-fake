@@ -75,7 +75,7 @@ export default function CreatePost() {
 
     return (
         <Box className={`maximise-width ${styles["create-edit-post-page"]}`} >
-            <Typography variant="h5" fontWeight={"bold"} color="space">Create Post</Typography>
+            <Typography variant="h5" fontWeight={"bold"}>Create Post</Typography>
             <PostEditor formState={formState}/>            
             <Box sx={{display:"flex", gap:"20px", marginLeft: "auto", marginRight: 0}}>
               <LoadingButton variant="contained" color="lightBrown" onClick={onClickSave} loading={isLoading} disabled={Object.keys(formState.errors).length > 0}>Save Draft</LoadingButton>

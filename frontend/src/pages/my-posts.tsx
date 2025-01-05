@@ -15,6 +15,10 @@ export default function MyPosts() {
     } 
 
   return (
-      <PostCards apiQueryHook={useGetMyPostsQuery} extraProps={{author: getUser()}}/>
+      <PostCards 
+        apiQueryHook={useGetMyPostsQuery} 
+        extraProps={{author: getUser()}}
+        title={"My Posts"}
+      />
   )
 }

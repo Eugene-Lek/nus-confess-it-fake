@@ -16,6 +16,10 @@ export default function MyDrafts() {
   } 
 
   return (
-      <PostCards apiQueryHook={useGetMyDraftsQuery} extraProps={{author: getUser()}}/>
+      <PostCards 
+        apiQueryHook={useGetMyDraftsQuery} 
+        extraProps={{author: getUser()}}
+        title="My Drafts"
+      />
   )
 }

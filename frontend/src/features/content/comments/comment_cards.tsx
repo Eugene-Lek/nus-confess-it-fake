@@ -35,9 +35,10 @@ interface props2 {
         author?: string
         likedBy?: string
     }
+    title: string
 }
 
-export const CommentCardsInListing: FC<props2> = ({apiQueryHook, extraProps}) => {
+export const CommentCardsInListing: FC<props2> = ({apiQueryHook, extraProps, title}) => {
     const dispatch = useAppDispatch()
     const query = useAppSelector(state => state.filter.query)
     const sortBy = useAppSelector(state => state.filter.sortBy)
@@ -72,6 +73,7 @@ export const CommentCardsInListing: FC<props2> = ({apiQueryHook, extraProps}) =>
 
     return (
         <Box className={`maximise-width ${styles["posts-comments-page"]}`}>
+            <Typography variant="h5" fontWeight={"bold"}>{title}</Typography>             
             <Box sx={{display: "flex", gap: "25px"}}>
                 <SortBySelect/>
                 {isLoading
