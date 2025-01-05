@@ -5,6 +5,10 @@ import { CommentCardsInListing } from "@/features/content/comments/comment_cards
 
 export default function MyComments() {
   return (
-      <CommentCardsInListing apiQueryHook={useGetMyCommentsQuery} extraProps={{author: getUser()}}/>
+      <CommentCardsInListing 
+        apiQueryHook={useGetMyCommentsQuery} 
+        extraProps={{author: getUser()}}
+        title="My Comments"
+      />
   )
 }

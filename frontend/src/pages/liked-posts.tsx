@@ -15,6 +15,10 @@ export default function LikedPosts() {
   } 
 
   return (
-      <PostCards apiQueryHook={useGetLikedPostsQuery} extraProps={{likedBy: getUser()}}/>
+      <PostCards 
+        apiQueryHook={useGetLikedPostsQuery} 
+        extraProps={{likedBy: getUser()}}
+        title="Liked Posts"
+      />
   )
 }
