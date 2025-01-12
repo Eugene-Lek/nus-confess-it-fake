@@ -24,6 +24,7 @@ Logged in users can:
 * Like/Dislike all posts and comments
 
 Other nice features:
+* The post/draft editor allows users to bold, underline, and italicise text, as well as create lists
 * Users are prompted to log in if they attempt an action/page visit that requires logging in
 * Input validation and error messages in both frontend and backend
 * Backend Logging
