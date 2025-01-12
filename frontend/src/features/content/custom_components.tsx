@@ -2,8 +2,8 @@
 
 import { TextareaAutosize as BaseTextareaAutosize } from '@mui/base/TextareaAutosize';
 import Markdown from 'react-markdown'
-import { Box, styled } from '@mui/system';
-import { FC, PropsWithChildren } from 'react';
+import { Box, styled, SxProps } from '@mui/system';
+import { FC, PropsWithChildren, ReactNode } from 'react';
 import rehypeRaw from 'rehype-raw';
 import styles from "./content.module.css"
 
@@ -19,9 +19,14 @@ export const Textarea = styled(BaseTextareaAutosize)(
  `,
 );
 
-export const MarkdownBody: FC<PropsWithChildren> = ({children}) => {
+interface MarkdownBodyProps {
+    children?: ReactNode | undefined
+    sx?: SxProps
+}
+
+export const MarkdownBody: FC<MarkdownBodyProps> = ({children, sx}) => {
     return (
-        <Box sx={{display: "flex", flexDirection: "column", gap: "10px"}}>
+        <Box sx={{...sx, display: "flex", flexDirection: "column", gap: "10px"}}>
             <Markdown components={{
                 p(props) {
                     const {node, ...rest} = props

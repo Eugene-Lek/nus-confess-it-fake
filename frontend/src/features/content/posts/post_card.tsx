@@ -5,6 +5,7 @@ import { VoteBox } from "../vote_box";
 import { removeNewlines } from "../utils";
 import { PostEditDeleteMenu } from "./post_edit_delete_menu";
 import styles from "../content.module.css"
+import { MarkdownBody } from "../custom_components";
 
 export const PostCard = (post: Post) => {
     const router = useRouter() // Use to route the user to a particular post when they click on it
@@ -25,13 +26,13 @@ export const PostCard = (post: Post) => {
                         ? <Typography variant="body1" color="grey" fontWeight={"bold"}>{"[Deleted]"}</Typography>  
                         : <Typography variant="body1" fontWeight={"bold"}>{post.title}</Typography>
                     }                         
-                    <Typography variant="body2" sx={{
+                    <MarkdownBody sx={{
                             overflow: "hidden",
                             textOverflow: "ellipsis",
                             display: "-webkit-box",
                             WebkitLineClamp: "3",
                             WebkitBoxOrient: "vertical",
-                    }}>{removeNewlines(post.body)}</Typography>                    
+                    }}>{removeNewlines(post.body)}</MarkdownBody>                    
                 </Box>
                 <PostEditDeleteMenu {...post}/>
             </Box>
