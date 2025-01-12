@@ -15,6 +15,7 @@ All users can:
 * View a particular post by clicking its card
 * View my comments and liked comments, filtered by keyword and sorted by Newest, Popular or Relevance (Newest by default)
 * View a particular comment by clicking its card. This will redirect the user to the post that the comment belongs to and automatically scroll to the particular comment
+* Trigger an automatic scroll to the original comment that a comment replied to by clicking the original comment embedded in the comment
 
 Logged in users can:
 * Create, edit, and delete their own posts
@@ -25,7 +26,7 @@ Logged in users can:
 Other nice features:
 * Users are prompted to log in if they attempt an action/page visit that requires logging in
 * Input validation and error messages in both frontend and backend
-* Logging
+* Backend Logging
 * Both desktop and mobile viewing are supported
 
 ## Project Architecture
@@ -37,7 +38,7 @@ Backend
    * Defines the data models and types
  * **routes package**
    * Defines the routes and route handlers
- * **main package**
+ * **main file/package**
    * Instantiates dependencies (e.g. postgres provider)
    * Passes these dependencies into the router constructor to create a router
    * Starts a server with the router
