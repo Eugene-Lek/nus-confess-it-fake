@@ -58,12 +58,12 @@ Frontend (src folder)
    * styles that are used by all features of the website
 
 ## Setting up the development environment
-* **Clone the project**
+<ins>**Clone the project**</ins>
 ```
 git clone https://github.com/Eugene-Lek/nus-confess-it-fake.git
 ```
 
-* **Set up the frontend**
+<ins>**Set up the frontend**</ins>
   1. Navigate to the /frontend folder via the command line
   ```
   cd nus-confess-it-fake/frontend
@@ -79,7 +79,7 @@ git clone https://github.com/Eugene-Lek/nus-confess-it-fake.git
   ```
 
 
-* **Set up the backend**
+<ins>**Set up the backend**</ins>
   1. If you are using Windows, run the "Docker Desktop" application. This is necessary because in the default daemon configuration on Windows, the docker client must be run elevated to connect.
   2. Open another terminal and navigate to the project's root directory
   ```
