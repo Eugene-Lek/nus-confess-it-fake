@@ -80,6 +80,7 @@ git clone https://github.com/Eugene-Lek/nus-confess-it-fake.git
 
 
 * **Set up the backend**
+  0. If you are using Windows, run the "Docker Desktop" application. This is necessary because in the default daemon configuration on Windows, the docker client must be run elevated to connect.
   1. Open another terminal and navigate to the project's root directory
   ```
   cd /path/to/nus-confess-it-fake
