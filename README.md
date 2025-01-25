@@ -80,16 +80,16 @@ git clone https://github.com/Eugene-Lek/nus-confess-it-fake.git
 
 
 * **Set up the backend**
-  0. If you are using Windows, run the "Docker Desktop" application. This is necessary because in the default daemon configuration on Windows, the docker client must be run elevated to connect.
-  1. Open another terminal and navigate to the project's root directory
+  1. If you are using Windows, run the "Docker Desktop" application. This is necessary because in the default daemon configuration on Windows, the docker client must be run elevated to connect.
+  2. Open another terminal and navigate to the project's root directory
   ```
   cd /path/to/nus-confess-it-fake
   ```
-  2. Build the backend server container
+  3. Build the backend server container
   ```
   docker-compose -f compose.dev.yaml build
   ```
-  3. Run the server and database containers
+  4. Run the server and database containers
   ```
   docker-compose -f compose.dev.yaml up -d
   ```
