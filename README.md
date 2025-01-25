@@ -66,7 +66,7 @@ git clone https://github.com/Eugene-Lek/nus-confess-it-fake.git
 * **Set up the frontend**
   1. Navigate to the /frontend folder via the command line
   ```
-  cd path/to/frontend
+  cd nus-confess-it-fake/frontend
   ```
   2. Install dependencies
   ```
@@ -80,11 +80,15 @@ git clone https://github.com/Eugene-Lek/nus-confess-it-fake.git
 
 
 * **Set up the backend**
-  1. Build the backend server container
+  1. Open another terminal and navigate to the project's root directory
+  ```
+  cd /path/to/nus-confess-it-fake
+  ```
+  2. Build the backend server container
   ```
   docker-compose -f compose.dev.yaml build
   ```
-  2. Run the server and database containers
+  3. Run the server and database containers
   ```
   docker-compose -f compose.dev.yaml up -d
   ```
